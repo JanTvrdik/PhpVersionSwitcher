@@ -60,9 +60,9 @@ namespace PhpVersionSwitcher
 			}
 		}
 
-		public ServiceControllerStatus ApacheStatus
+		public bool IsHttpServerRunning
 		{
-			get { return this.apache.Status; }
+			get { return this.apache.Status == ServiceControllerStatus.Running; }
 		}
 
 		public string PhpDir

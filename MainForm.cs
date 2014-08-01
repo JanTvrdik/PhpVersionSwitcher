@@ -19,10 +19,10 @@ namespace PhpVersionSwitcher
 			this.notifyIcon.Icon = this.Icon;
 			this.model = new Model(Properties.Settings.Default.PhpDir, Properties.Settings.Default.HttpServerServiceName);
 			this.waitingForm = new WaitingForm();
-			this.init();
+			this.initMainMenu();
 		}
 
-		private void init()
+		private void initMainMenu()
 		{
 			var activeVersion = this.model.ActiveVersion;
 			var versions = this.model.AvailableVersions;
@@ -52,19 +52,17 @@ namespace PhpVersionSwitcher
 			this.apacheStart = menu.DropDownItems.Add("Start", null, new EventHandler(apacheStart_Clicked));
 			this.apacheStop = menu.DropDownItems.Add("Stop", null, new EventHandler(apacheStop_Clicked));
 			this.apacheRestart = menu.DropDownItems.Add("Restart", null, new EventHandler(apacheRestart_Clicked));
-
-			var apacheStatus = this.model.ApacheStatus;
-			if (apacheStatus == System.ServiceProcess.ServiceControllerStatus.Running)
-			{
-				this.apacheStart.Enabled = false;
-			}
-			else if (apacheStatus == System.ServiceProcess.ServiceControllerStatus.Stopped)
-			{
-				this.apacheStop.Enabled = false;
-				this.apacheRestart.Enabled = false;
-			}
+			this.updateApacheMenuState();
 
 			return menu;
+		}
+
+		private void updateApacheMenuState()
+		{
+			var running = this.model.IsHttpServerRunning;
+			this.apacheStart.Enabled = !running;
+			this.apacheStop.Enabled = running;
+			this.apacheRestart.Enabled = running;
 		}
 
 		private void setActiveItem(ToolStripMenuItem item)
@@ -118,12 +116,8 @@ namespace PhpVersionSwitcher
 		{
 			attempt(async () =>
 			{
-				if (await this.model.StartApache())
-				{
-					this.apacheStart.Enabled = false;
-					this.apacheStop.Enabled = true;
-					this.apacheRestart.Enabled = true;
-				}
+				await this.model.StartApache();
+				this.updateApacheMenuState();
 			});
 		}
 
@@ -131,12 +125,8 @@ namespace PhpVersionSwitcher
 		{
 			attempt(async () =>
 			{
-				if (await this.model.StopApache())
-				{
-					this.apacheStart.Enabled = true;
-					this.apacheStop.Enabled = false;
-					this.apacheRestart.Enabled = false;
-				}
+				await this.model.StopApache();
+				this.updateApacheMenuState();
 			});
 		}
 
@@ -144,18 +134,14 @@ namespace PhpVersionSwitcher
 		{
 			attempt(async () =>
 			{
-				if (await this.model.StopApache() && await this.model.StartApache())
-				{
-					this.apacheStart.Enabled = false;
-					this.apacheStop.Enabled = true;
-					this.apacheRestart.Enabled = true;
-				}
+				var result = await this.model.StopApache() && await this.model.StartApache();
+				this.updateApacheMenuState();
 			});
 		}
 
 		private void refresh_Clicked(object sender, EventArgs e)
 		{
-			this.init();
+			this.initMainMenu();
 		}
 
 		private void close_Click(object sender, EventArgs e)
