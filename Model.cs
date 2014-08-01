@@ -47,11 +47,18 @@ namespace PhpVersionSwitcher
 		{
 			get
 			{
-				var target = Symlinks.GetTarget(this.ActivePhpDir);
-				var name = new DirectoryInfo(target).Name;
-				Version version;
-				Version.TryParse(name, out version);
-				return version;
+				try
+				{
+					var target = Symlinks.GetTarget(this.ActivePhpDir); // may throw exception
+					var name = new DirectoryInfo(target).Name;
+					Version version;
+					Version.TryParse(name, out version);
+					return version;
+				}
+				catch (System.ComponentModel.Win32Exception)
+				{
+					return null;
+				}
 			}
 		}
 

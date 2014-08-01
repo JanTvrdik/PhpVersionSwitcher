@@ -33,7 +33,7 @@ namespace PhpVersionSwitcher
 				var item = new ToolStripMenuItem(version.ToString(), null, new EventHandler(version_Clicked));
 				item.Tag = version;
 
-				if (version.Equals(activeVersion))
+				if (activeVersion != null && version.Equals(activeVersion))
 				{
 					this.setActiveItem(item);
 				}
