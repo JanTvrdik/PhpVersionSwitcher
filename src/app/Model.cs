@@ -61,15 +61,15 @@ namespace PhpVersionSwitcher
 
 		public async Task SwitchTo(Version version)
 		{
-			await StopHttpServer();
+			await this.StopHttpServer();
 			await this.UpdateSymlink(version);
 			await this.UpdatePhpIni(version);
-			await StartHttpServer();
+			await this.StartHttpServer();
 		}
 
 		public async Task StartHttpServer()
 		{
-			if (!await TrySetHttpServerState(ServiceControllerStatus.Running, this.httpServer.Start))
+			if (!await this.TrySetHttpServerState(ServiceControllerStatus.Running, this.httpServer.Start))
 			{
 				throw new HttpServerStartFailedException();
 			}
@@ -77,7 +77,7 @@ namespace PhpVersionSwitcher
 
 		public async Task StopHttpServer()
 		{
-			if (!await TrySetHttpServerState(ServiceControllerStatus.Stopped, this.httpServer.Stop))
+			if (!await this.TrySetHttpServerState(ServiceControllerStatus.Stopped, this.httpServer.Stop))
 			{
 				throw new HttpServerStopFailedException();
 			}

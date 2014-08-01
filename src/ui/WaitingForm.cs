@@ -6,7 +6,7 @@ namespace PhpVersionSwitcher
 	{
 		public WaitingForm()
 		{
-			InitializeComponent();
+			this.InitializeComponent();
 		}
 	}
 }

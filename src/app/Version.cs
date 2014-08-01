@@ -44,7 +44,7 @@ namespace PhpVersionSwitcher
 
 		public bool Equals(Version other)
 		{
-			return CompareTo(other) == 0;
+			return this.CompareTo(other) == 0;
 		}
 
 		public static bool TryParse(string s, out Version version)
