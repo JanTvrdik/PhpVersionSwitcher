@@ -77,30 +77,30 @@ namespace PhpVersionSwitcher
 			this.waitingForm.description.Text = @"Waiting for " + description + @"...";
 			this.waitingForm.Show();
 
-			try
+			while (true)
 			{
-				await action();
-				this.waitingForm.Hide();
+				try
+				{
+					await action();
+					break;
+				}
+				catch (HttpServerStartFailedException)
+				{
+					var serviceName = Properties.Settings.Default.HttpServerServiceName;
+					var button = MessageBox.Show("Unable to start " + serviceName + " service.", "Operation failed", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
+					if (button != DialogResult.Retry) break;
+				}
+				catch (HttpServerStopFailedException)
+				{
+					var serviceName = Properties.Settings.Default.HttpServerServiceName;
+					var button = MessageBox.Show("Unable to stop " + serviceName + " service.", "Operation failed", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
+					if (button != DialogResult.Retry) break;
+				}
 			}
-			catch (HttpServerStartFailedException)
-			{
-				this.waitingForm.Hide();
-				var serviceName = Properties.Settings.Default.HttpServerServiceName;
-				var button = MessageBox.Show("Unable to start " + serviceName + " service.", "Operation failed", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
-				if (button == DialogResult.Retry) this.Attempt(description, action);
-			}
-			catch (HttpServerStopFailedException)
-			{
-				this.waitingForm.Hide();
-				var serviceName = Properties.Settings.Default.HttpServerServiceName;
-				var button = MessageBox.Show("Unable to stop " + serviceName + " service.", "Operation failed", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
-				if (button == DialogResult.Retry) this.Attempt(description, action);
-			}
-			finally
-			{
-				this.UpdateHttpServerMenuState();
-				this.notifyIconMenu.Enabled = true;
-			}
+
+			this.UpdateHttpServerMenuState();
+			this.waitingForm.Hide();
+			this.notifyIconMenu.Enabled = true;
 		}
 
 		private void version_Clicked(object sender, EventArgs e)
