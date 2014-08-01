@@ -47,16 +47,11 @@ namespace PhpVersionSwitcher
 		{
 			get
 			{
-				try
-				{
-					var target = Symlinks.GetTarget(this.ActivePhpDir);
-					var name = new DirectoryInfo(target).Name;
-					return Version.Parse(name);
-				}
-				catch (Exception)
-				{
-					return null;
-				}
+				var target = Symlinks.GetTarget(this.ActivePhpDir);
+				var name = new DirectoryInfo(target).Name;
+				Version version;
+				Version.TryParse(name, out version);
+				return version;
 			}
 		}
 
@@ -131,7 +126,7 @@ namespace PhpVersionSwitcher
 			var files = new string[] {
 				version.Major + ".x.x.ini",
 				version.Major + "." + version.Minor + ".x.ini",
-				version.Major + "." + version.Minor + "." + version.Build + ".ini"
+				version.Major + "." + version.Minor + "." + version.Patch + ".ini"
 			};
 
 			var ini = new StringBuilder();
