@@ -73,6 +73,8 @@ namespace PhpVersionSwitcher
 
         private async void version_Clicked(object sender, EventArgs e)
         {
+            this.notifyIconMenu.Enabled = false;
+            this.waitingForm.Show();
 
             var item = (ToolStripMenuItem)sender;
             var version = (Version)item.Tag;
@@ -91,6 +93,11 @@ namespace PhpVersionSwitcher
             {
                 var button = MessageBox.Show("Unable to stop Apache service.", "Operation failed", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
                 if (button == System.Windows.Forms.DialogResult.Retry) version_Clicked(sender, e);
+            }
+            finally
+            {
+                this.waitingForm.Hide();
+                this.notifyIconMenu.Enabled = true;
             }
         }
 
