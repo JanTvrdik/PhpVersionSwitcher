@@ -49,7 +49,7 @@ namespace PhpVersionSwitcher
 
 		public static bool TryParse(string s, out Version version)
 		{
-			Match match = Regex.Match(s, @"^(\d+)\.(\d+)\.(\d+)(?:-(alpha|beta|rc)(\d+))?$", RegexOptions.IgnoreCase);
+			Match match = Regex.Match(s, @"^(\d+)\.(\d+)\.(\d+)(?:-(alpha|beta|rc)(\d+))?$");
 			if (!match.Success)
 			{
 				version = null;
