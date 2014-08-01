@@ -8,9 +8,9 @@ namespace PhpVersionSwitcher
 	{
 		private Model model;
 		private ToolStripMenuItem activeVersion;
-		private ToolStripItem apacheStart;
-		private ToolStripItem apacheStop;
-		private ToolStripItem apacheRestart;
+		private ToolStripItem httpServerStart;
+		private ToolStripItem httpServerStop;
+		private ToolStripItem httpServerRestart;
 		private WaitingForm waitingForm;
 
 		public MainForm()
@@ -41,28 +41,28 @@ namespace PhpVersionSwitcher
 				this.notifyIconMenu.Items.Add(item);
 			}
 			this.notifyIconMenu.Items.Add(new ToolStripSeparator());
-			this.notifyIconMenu.Items.Add(this.getApacheMenu());
+			this.notifyIconMenu.Items.Add(this.getHttpServerMenu());
 			this.notifyIconMenu.Items.Add("Refresh", null, new EventHandler(refresh_Clicked));
 			this.notifyIconMenu.Items.Add("Close", null, new EventHandler(close_Click));
 		}
 
-		private ToolStripMenuItem getApacheMenu()
+		private ToolStripMenuItem getHttpServerMenu()
 		{
-			var menu = new ToolStripMenuItem("Apache");
-			this.apacheStart = menu.DropDownItems.Add("Start", null, new EventHandler(apacheStart_Clicked));
-			this.apacheStop = menu.DropDownItems.Add("Stop", null, new EventHandler(apacheStop_Clicked));
-			this.apacheRestart = menu.DropDownItems.Add("Restart", null, new EventHandler(apacheRestart_Clicked));
-			this.updateApacheMenuState();
+			var menu = new ToolStripMenuItem(Properties.Settings.Default.HttpServerServiceName);
+			this.httpServerStart = menu.DropDownItems.Add("Start", null, new EventHandler(httpServerStart_Clicked));
+			this.httpServerStop = menu.DropDownItems.Add("Stop", null, new EventHandler(httpServerStop_Clicked));
+			this.httpServerRestart = menu.DropDownItems.Add("Restart", null, new EventHandler(httpServerRestart_Clicked));
+			this.updateHttpServerMenuState();
 
 			return menu;
 		}
 
-		private void updateApacheMenuState()
+		private void updateHttpServerMenuState()
 		{
 			var running = this.model.IsHttpServerRunning;
-			this.apacheStart.Enabled = !running;
-			this.apacheStop.Enabled = running;
-			this.apacheRestart.Enabled = running;
+			this.httpServerStart.Enabled = !running;
+			this.httpServerStop.Enabled = running;
+			this.httpServerRestart.Enabled = running;
 		}
 
 		private void setActiveItem(ToolStripMenuItem item)
@@ -81,22 +81,24 @@ namespace PhpVersionSwitcher
 			{
 				await action();
 			}
-			catch (ApacheStartFailedException)
+			catch (HttpServerStartFailedException)
 			{
 				this.waitingForm.Hide();
-				var button = MessageBox.Show("Unable to start Apache service.", "Operation failed", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
+				var serviceName = Properties.Settings.Default.HttpServerServiceName;
+				var button = MessageBox.Show("Unable to start " + serviceName + " service.", "Operation failed", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
 				if (button == System.Windows.Forms.DialogResult.Retry) attempt(action);
 			}
-			catch (ApacheStopFailedException)
+			catch (HttpServerStopFailedException)
 			{
 				this.waitingForm.Hide();
-				var button = MessageBox.Show("Unable to stop Apache service.", "Operation failed", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
+				var serviceName = Properties.Settings.Default.HttpServerServiceName;
+				var button = MessageBox.Show("Unable to stop " + serviceName + " service.", "Operation failed", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
 				if (button == System.Windows.Forms.DialogResult.Retry) attempt(action);
 			}
 			finally
 			{
 				this.waitingForm.Hide();
-				this.updateApacheMenuState();
+				this.updateHttpServerMenuState();
 				this.notifyIconMenu.Enabled = true;
 			}
 		}
@@ -113,28 +115,28 @@ namespace PhpVersionSwitcher
 			});
 		}
 
-		private void apacheStart_Clicked(object sender, EventArgs e)
+		private void httpServerStart_Clicked(object sender, EventArgs e)
 		{
 			attempt(async () =>
 			{
-				await this.model.StartApache();
+				await this.model.StartHttpServer();
 			});
 		}
 
-		private void apacheStop_Clicked(object sender, EventArgs e)
+		private void httpServerStop_Clicked(object sender, EventArgs e)
 		{
 			attempt(async () =>
 			{
-				await this.model.StopApache();
+				await this.model.StopHttpServer();
 			});
 		}
 
-		private void apacheRestart_Clicked(object sender, EventArgs e)
+		private void httpServerRestart_Clicked(object sender, EventArgs e)
 		{
 			attempt(async () =>
 			{
-				await this.model.StartApache();
-				await this.model.StopApache();
+				await this.model.StartHttpServer();
+				await this.model.StopHttpServer();
 			});
 		}
 

@@ -12,7 +12,7 @@ namespace PhpVersionSwitcher
 	{
 		private string phpDir;
 
-		private ServiceController apache;
+		private ServiceController httpServer;
 
 		/** how long to wait for status service change (in seconds) */
 		private const int WAIT_TIME = 7;
@@ -20,7 +20,7 @@ namespace PhpVersionSwitcher
 		public Model(string phpDir, string httpServiceName)
 		{
 			this.phpDir = phpDir;
-			this.apache = new ServiceController(httpServiceName);
+			this.httpServer = new ServiceController(httpServiceName);
 		}
 
 		public SortedSet<Version> AvailableVersions
@@ -57,7 +57,7 @@ namespace PhpVersionSwitcher
 
 		public bool IsHttpServerRunning
 		{
-			get { return this.apache.Status == ServiceControllerStatus.Running; }
+			get { return this.httpServer.Status == ServiceControllerStatus.Running; }
 		}
 
 		public string PhpDir
@@ -82,42 +82,42 @@ namespace PhpVersionSwitcher
 
 		public async Task SwitchTo(Version version)
 		{
-			await StopApache();
+			await StopHttpServer();
 			this.updateSymlink(version);
 			this.updatePhpIni(version);
-			await StartApache();
+			await StartHttpServer();
 		}
 
-		public async Task StartApache()
+		public async Task StartHttpServer()
 		{
-			if (!await trySetApacheState(ServiceControllerStatus.Running, this.apache.Start))
+			if (!await trySetHttpServerState(ServiceControllerStatus.Running, this.httpServer.Start))
 			{
-				throw new ApacheStartFailedException();
+				throw new HttpServerStartFailedException();
 			}
 		}
 
-		public async Task StopApache()
+		public async Task StopHttpServer()
 		{
-			if (!await trySetApacheState(ServiceControllerStatus.Stopped, this.apache.Stop))
+			if (!await trySetHttpServerState(ServiceControllerStatus.Stopped, this.httpServer.Stop))
 			{
-				throw new ApacheStopFailedException();
+				throw new HttpServerStopFailedException();
 			}
 		}
 
-		private Task<bool> trySetApacheState(ServiceControllerStatus status, Action method)
+		private Task<bool> trySetHttpServerState(ServiceControllerStatus status, Action method)
 		{
 			return Task.Run(() =>
 			{
 				try
 				{
 					method();
-					this.apache.WaitForStatus(status, TimeSpan.FromSeconds(WAIT_TIME));
+					this.httpServer.WaitForStatus(status, TimeSpan.FromSeconds(WAIT_TIME));
 				}
 				catch (System.ServiceProcess.TimeoutException) { }
 				catch (InvalidOperationException) { }
 
-				this.apache.Refresh();
-				return this.apache.Status == status;
+				this.httpServer.Refresh();
+				return this.httpServer.Status == status;
 			});
 		}
 
@@ -166,22 +166,22 @@ namespace PhpVersionSwitcher
 	}
 }
 
-abstract class ApacheFailedException : Exception
+abstract class HttpServerFailedException : Exception
 {
 	public ServiceControllerStatus status;
 
-	ApacheFailedException(ServiceControllerStatus status)
+	HttpServerFailedException(ServiceControllerStatus status)
 	{
 		this.status = status;
 	}
 }
 
-class ApacheStartFailedException : Exception
+class HttpServerStartFailedException : Exception
 {
 
 }
 
-class ApacheStopFailedException : Exception
+class HttpServerStopFailedException : Exception
 {
 
 }
