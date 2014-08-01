@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace PhpVersionSwitcher
 {
-    public partial class mainForm : Form
+    public partial class MainForm : Form
     {
         private Model model;
         private ToolStripMenuItem activeVersion;
@@ -11,7 +11,7 @@ namespace PhpVersionSwitcher
         private ToolStripItem apacheStop;
         private ToolStripItem apacheRestart;
 
-        public mainForm()
+        public MainForm()
         {
             InitializeComponent();
             this.notifyIcon.Icon = this.Icon;

@@ -15,7 +15,7 @@ namespace PhpVersionSwitcher
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            var form = new mainForm();
+            var form = new MainForm();
             Application.Run();
         }
     }
