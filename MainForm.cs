@@ -72,32 +72,33 @@ namespace PhpVersionSwitcher
 			this.activeVersion.Checked = true;
 		}
 
-		private async void attempt(Func<Task> action)
+		private async void attempt(string description, Func<Task> action)
 		{
 			this.notifyIconMenu.Enabled = false;
+			this.waitingForm.description.Text = "Waiting for " + description + "...";
 			this.waitingForm.Show();
 
 			try
 			{
 				await action();
+				this.waitingForm.Hide();
 			}
 			catch (HttpServerStartFailedException)
 			{
 				this.waitingForm.Hide();
 				var serviceName = Properties.Settings.Default.HttpServerServiceName;
 				var button = MessageBox.Show("Unable to start " + serviceName + " service.", "Operation failed", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
-				if (button == System.Windows.Forms.DialogResult.Retry) attempt(action);
+				if (button == System.Windows.Forms.DialogResult.Retry) attempt(description, action);
 			}
 			catch (HttpServerStopFailedException)
 			{
 				this.waitingForm.Hide();
 				var serviceName = Properties.Settings.Default.HttpServerServiceName;
 				var button = MessageBox.Show("Unable to stop " + serviceName + " service.", "Operation failed", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
-				if (button == System.Windows.Forms.DialogResult.Retry) attempt(action);
+				if (button == System.Windows.Forms.DialogResult.Retry) attempt(description, action);
 			}
 			finally
 			{
-				this.waitingForm.Hide();
 				this.updateHttpServerMenuState();
 				this.notifyIconMenu.Enabled = true;
 			}
@@ -108,7 +109,7 @@ namespace PhpVersionSwitcher
 			var menuItem = (ToolStripMenuItem)sender;
 			var version = (Version)menuItem.Tag;
 
-			attempt(async () =>
+			attempt("PHP version to change", async () =>
 			{
 				await this.model.SwitchTo(version);
 				this.setActiveItem(menuItem);
@@ -117,7 +118,7 @@ namespace PhpVersionSwitcher
 
 		private void httpServerStart_Clicked(object sender, EventArgs e)
 		{
-			attempt(async () =>
+			attempt("HTTP server to start", async () =>
 			{
 				await this.model.StartHttpServer();
 			});
@@ -125,7 +126,7 @@ namespace PhpVersionSwitcher
 
 		private void httpServerStop_Clicked(object sender, EventArgs e)
 		{
-			attempt(async () =>
+			attempt("HTTP server to stop", async () =>
 			{
 				await this.model.StopHttpServer();
 			});
@@ -133,7 +134,7 @@ namespace PhpVersionSwitcher
 
 		private void httpServerRestart_Clicked(object sender, EventArgs e)
 		{
-			attempt(async () =>
+			attempt("HTTP server to restart", async () =>
 			{
 				await this.model.StartHttpServer();
 				await this.model.StopHttpServer();
