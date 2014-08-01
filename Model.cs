@@ -15,7 +15,7 @@ namespace PhpVersionSwitcher
 		private ServiceController apache;
 
 		/** how long to wait for status service change (in seconds) */
-		private const int WAIT_TIME = 5;
+		private const int WAIT_TIME = 7;
 
 		public Model(string phpDir, string httpServiceName)
 		{
