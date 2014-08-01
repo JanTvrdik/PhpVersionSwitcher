@@ -1,5 +1,8 @@
 ﻿# PhpVersionSwitcher
 
+![PhpVersionSwitcher screenshot](http://skladka.merxes.cz/img/phpversionswitcher.png)
+
+
 ## Installation
 
 1. Download and extract a [release archive](https://github.com/JanTvrdik/PhpVersionSwitcher/releases) to directory of your choice
