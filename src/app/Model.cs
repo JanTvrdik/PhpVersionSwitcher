@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.ServiceProcess;
 using System.Text;
@@ -10,94 +9,67 @@ namespace PhpVersionSwitcher
 {
 	class Model
 	{
-		private string phpDir;
+		public const int WaitTime = 7;
+
+		private string phpBaseDir;
 
 		private ServiceController httpServer;
 
-		/** how long to wait for status service change (in seconds) */
-		private const int WAIT_TIME = 7;
-
-		public Model(string phpDir, string httpServiceName)
+		public Model(string phpBaseDir, string httpServiceName)
 		{
-			this.phpDir = phpDir;
+			this.phpBaseDir = phpBaseDir;
 			this.httpServer = new ServiceController(httpServiceName);
 		}
 
-		public SortedSet<Version> AvailableVersions
+		public SortedSet<Version> GetAvailableVersions()
 		{
-			get
+			var versions = new SortedSet<Version>();
+			var dirs = Directory.EnumerateDirectories(this.VersionsDir);
+			foreach (var dir in dirs)
 			{
-				var versions = new SortedSet<Version>();
-				var dirs = Directory.EnumerateDirectories(this.VersionsDir);
+				var info = new DirectoryInfo(dir);
 				Version version;
-				foreach (string dir in dirs)
+				if (File.Exists(dir + "\\php.exe") && Version.TryParse(info.Name, out version))
 				{
-					var info = new DirectoryInfo(dir);
-					if (File.Exists(dir + "\\php.exe") && Version.TryParse(info.Name, out version))
-					{
-						versions.Add(version);
-					}
+					versions.Add(version);
 				}
-
-				return versions;
 			}
+			return versions;
 		}
 
-		public Version ActiveVersion
+		public Version GetActiveVersion()
 		{
-			get
+			try
 			{
-				try
-				{
-					var target = Symlinks.GetTarget(this.ActivePhpDir); // may throw exception
-					var name = new DirectoryInfo(target).Name;
-					Version version;
-					Version.TryParse(name, out version);
-					return version;
-				}
-				catch (System.ComponentModel.Win32Exception)
-				{
-					return null;
-				}
+				var target = Symlinks.GetTarget(this.ActivePhpDir); // may throw exception
+				var name = new DirectoryInfo(target).Name;
+				Version version;
+				Version.TryParse(name, out version);
+				return version;
+			}
+			catch (System.ComponentModel.Win32Exception)
+			{
+				return null;
 			}
 		}
 
-		public bool IsHttpServerRunning
+		public bool IsHttpServerRunning()
 		{
-			get { return this.httpServer.Status == ServiceControllerStatus.Running; }
-		}
-
-		public string PhpDir
-		{
-			get { return this.phpDir; }
-		}
-
-		public string ActivePhpDir
-		{
-			get { return this.phpDir + "\\active"; }
-		}
-
-		public string ConfigurationDir
-		{
-			get { return this.phpDir + "\\configuration"; }
-		}
-
-		public string VersionsDir
-		{
-			get { return this.phpDir + "\\versions"; }
+			this.httpServer.Refresh();
+			return this.httpServer.Status == ServiceControllerStatus.Running;
 		}
 
 		public async Task SwitchTo(Version version)
 		{
 			await StopHttpServer();
-			this.updateSymlink(version);
-			this.updatePhpIni(version);
+			this.UpdateSymlink(version);
+			this.UpdatePhpIni(version);
 			await StartHttpServer();
 		}
 
 		public async Task StartHttpServer()
 		{
-			if (!await trySetHttpServerState(ServiceControllerStatus.Running, this.httpServer.Start))
+			if (!await TrySetHttpServerState(ServiceControllerStatus.Running, this.httpServer.Start))
 			{
 				throw new HttpServerStartFailedException();
 			}
@@ -105,20 +77,40 @@ namespace PhpVersionSwitcher
 
 		public async Task StopHttpServer()
 		{
-			if (!await trySetHttpServerState(ServiceControllerStatus.Stopped, this.httpServer.Stop))
+			if (!await TrySetHttpServerState(ServiceControllerStatus.Stopped, this.httpServer.Stop))
 			{
 				throw new HttpServerStopFailedException();
 			}
 		}
 
-		private Task<bool> trySetHttpServerState(ServiceControllerStatus status, Action method)
+		private string ActivePhpDir
+		{
+			get { return this.phpBaseDir + "\\active"; }
+		}
+
+		private string ConfigurationDir
+		{
+			get { return this.phpBaseDir + "\\configuration"; }
+		}
+
+		private string VersionsDir
+		{
+			get { return this.phpBaseDir + "\\versions"; }
+		}
+
+		private string GetVersionDir(Version version)
+		{
+			return this.VersionsDir + "\\" + version;
+		}
+
+		private Task<bool> TrySetHttpServerState(ServiceControllerStatus status, Action method)
 		{
 			return Task.Run(() =>
 			{
 				try
 				{
 					method();
-					this.httpServer.WaitForStatus(status, TimeSpan.FromSeconds(WAIT_TIME));
+					this.httpServer.WaitForStatus(status, TimeSpan.FromSeconds(WaitTime));
 				}
 				catch (System.ServiceProcess.TimeoutException) { }
 				catch (InvalidOperationException) { }
@@ -128,7 +120,7 @@ namespace PhpVersionSwitcher
 			});
 		}
 
-		private void updatePhpIni(Version version)
+		private void UpdatePhpIni(Version version)
 		{
 			var files = new string[] {
 				version.Major + ".x.x.ini",
@@ -143,7 +135,7 @@ namespace PhpVersionSwitcher
 				if (File.Exists(path))
 				{
 					var content = File.ReadAllText(path);
-					content = content.Replace("%phpDir%", this.getVersionDir(version));
+					content = content.Replace("%phpDir%", this.GetVersionDir(version));
 					ini.AppendLine();
 					ini.AppendLine(content);
 				}
@@ -152,10 +144,10 @@ namespace PhpVersionSwitcher
 			File.WriteAllText(this.ActivePhpDir + "\\php.ini", ini.ToString());
 		}
 
-		private void updateSymlink(Version version)
+		private void UpdateSymlink(Version version)
 		{
 			var symlink = this.ActivePhpDir;
-			var target = this.getVersionDir(version);
+			var target = this.GetVersionDir(version);
 
 			try
 			{
@@ -164,21 +156,6 @@ namespace PhpVersionSwitcher
 			catch (DirectoryNotFoundException) { }
 
 			Symlinks.CreateDir(symlink, target);
-		}
-
-		private string getVersionDir(Version version)
-		{
-			return this.VersionsDir + "\\" + version.ToString();
-		}
-	}
-
-	abstract class HttpServerFailedException : Exception
-	{
-		public ServiceControllerStatus status;
-
-		HttpServerFailedException(ServiceControllerStatus status)
-		{
-			this.status = status;
 		}
 	}
 

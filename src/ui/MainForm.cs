@@ -23,8 +23,8 @@ namespace PhpVersionSwitcher
 
 		private void initMainMenu()
 		{
-			var activeVersion = this.model.ActiveVersion;
-			var versions = this.model.AvailableVersions;
+			var activeVersion = this.model.GetActiveVersion();
+			var versions = this.model.GetAvailableVersions();
 
 			this.notifyIconMenu.Items.Clear();
 			foreach (var version in versions)
@@ -58,7 +58,7 @@ namespace PhpVersionSwitcher
 
 		private void updateHttpServerMenuState()
 		{
-			var running = this.model.IsHttpServerRunning;
+			var running = this.model.IsHttpServerRunning();
 			this.httpServerStart.Enabled = !running;
 			this.httpServerStop.Enabled = running;
 			this.httpServerRestart.Enabled = running;
