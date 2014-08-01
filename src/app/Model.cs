@@ -62,8 +62,8 @@ namespace PhpVersionSwitcher
 		public async Task SwitchTo(Version version)
 		{
 			await StopHttpServer();
-			this.UpdateSymlink(version);
-			this.UpdatePhpIni(version);
+			await this.UpdateSymlink(version);
+			await this.UpdatePhpIni(version);
 			await StartHttpServer();
 		}
 
@@ -120,42 +120,49 @@ namespace PhpVersionSwitcher
 			});
 		}
 
-		private void UpdatePhpIni(Version version)
+		private Task UpdatePhpIni(Version version)
 		{
-			var files = new string[] {
-				version.Major + ".x.x.ini",
-				version.Major + "." + version.Minor + ".x.ini",
-				version.Major + "." + version.Minor + "." + version.Patch + ".ini"
-			};
-
-			var ini = new StringBuilder();
-			foreach (var file in files)
+			return Task.Run(() =>
 			{
-				var path = this.ConfigurationDir + "\\" + file;
-				if (File.Exists(path))
+				var files = new string[]
 				{
-					var content = File.ReadAllText(path);
-					content = content.Replace("%phpDir%", this.GetVersionDir(version));
-					ini.AppendLine();
-					ini.AppendLine(content);
-				}
-			}
+					version.Major + ".x.x.ini",
+					version.Major + "." + version.Minor + ".x.ini",
+					version.Major + "." + version.Minor + "." + version.Patch + ".ini"
+				};
 
-			File.WriteAllText(this.ActivePhpDir + "\\php.ini", ini.ToString());
+				var ini = new StringBuilder();
+				foreach (var file in files)
+				{
+					var path = this.ConfigurationDir + "\\" + file;
+					if (File.Exists(path))
+					{
+						var content = File.ReadAllText(path);
+						content = content.Replace("%phpDir%", this.GetVersionDir(version));
+						ini.AppendLine();
+						ini.AppendLine(content);
+					}
+				}
+
+				File.WriteAllText(this.ActivePhpDir + "\\php.ini", ini.ToString());
+			});
 		}
 
-		private void UpdateSymlink(Version version)
+		private Task UpdateSymlink(Version version)
 		{
-			var symlink = this.ActivePhpDir;
-			var target = this.GetVersionDir(version);
-
-			try
+			return Task.Run(() =>
 			{
-				Directory.Delete(symlink, true);
-			}
-			catch (DirectoryNotFoundException) { }
+				var symlink = this.ActivePhpDir;
+				var target = this.GetVersionDir(version);
 
-			Symlinks.CreateDir(symlink, target);
+				try
+				{
+					Directory.Delete(symlink, true);
+				}
+				catch (DirectoryNotFoundException) { }
+
+				Symlinks.CreateDir(symlink, target);
+			});
 		}
 	}
 
