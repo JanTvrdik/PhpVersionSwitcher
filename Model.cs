@@ -13,9 +13,8 @@ namespace PhpVersionSwitcher
 
         private ServiceController apache;
 
-		private const int MAX_START_RETRIES = 5;
-
-		private const int MAX_STOP_RETRIES = 5;
+        /** how long to wait for status service change (in seconds) */
+        private const int WAIT_TIME = 5;
 
         public Model(string phpDir, string httpServiceName)
         {
@@ -95,32 +94,26 @@ namespace PhpVersionSwitcher
 
         public bool StartApache()
         {
-			for (int attempt = 1; attempt <= MAX_START_RETRIES && this.apache.Status != ServiceControllerStatus.Running; attempt++)
+            try
             {
-                try
-                {
-                    this.apache.Start();
-                    this.apache.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(1));
-                }
-                catch (System.ServiceProcess.TimeoutException) { }
-                catch (InvalidOperationException) { }
+                this.apache.Start();
+                this.apache.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(WAIT_TIME));
             }
+            catch (System.ServiceProcess.TimeoutException) { }
+            catch (InvalidOperationException) { }
 
             return (this.apache.Status == ServiceControllerStatus.Running || this.apache.Status == ServiceControllerStatus.StartPending);
         }
 
         public bool StopApache()
         {
-            for (int attempt = 1; attempt <= MAX_STOP_RETRIES && this.apache.Status != ServiceControllerStatus.Stopped; attempt++)
-			{
-				try
-				{
-					this.apache.Stop();
-					this.apache.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(1));
-				}
-				catch (System.ServiceProcess.TimeoutException) { }
-				catch (InvalidOperationException) { }
-			}
+            try
+            {
+                this.apache.Stop();
+                this.apache.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(WAIT_TIME));
+            }
+            catch (System.ServiceProcess.TimeoutException) { }
+            catch (InvalidOperationException) { }
 
             return (this.apache.Status == ServiceControllerStatus.Stopped || this.apache.Status == ServiceControllerStatus.StopPending);
         }
