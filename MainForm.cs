@@ -71,31 +71,32 @@ namespace PhpVersionSwitcher
             this.activeVersion.Checked = true;
         }
 
-        private void version_Clicked(object sender, EventArgs e)
+        private async void version_Clicked(object sender, EventArgs e)
         {
+
             var item = (ToolStripMenuItem)sender;
             var version = (Version)item.Tag;
 
-			try
-			{
-				this.model.SwitchTo(version);
+            try
+            {
+                await this.model.SwitchTo(version);
                 this.setActiveItem(item);
-			}
-			catch (ApacheStartFailedException)
-			{
-				var button = MessageBox.Show("Unable to start Apache service.", "Operation failed", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
-				if (button == System.Windows.Forms.DialogResult.Retry) version_Clicked(sender, e);
-			}
-			catch (ApacheStopFailedException)
-			{
-				var button = MessageBox.Show("Unable to stop Apache service.", "Operation failed", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
-				if (button == System.Windows.Forms.DialogResult.Retry) version_Clicked(sender, e);
-			}
+            }
+            catch (ApacheStartFailedException)
+            {
+                var button = MessageBox.Show("Unable to start Apache service.", "Operation failed", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
+                if (button == System.Windows.Forms.DialogResult.Retry) version_Clicked(sender, e);
+            }
+            catch (ApacheStopFailedException)
+            {
+                var button = MessageBox.Show("Unable to stop Apache service.", "Operation failed", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
+                if (button == System.Windows.Forms.DialogResult.Retry) version_Clicked(sender, e);
+            }
         }
 
-        private void apacheStart_Clicked(object sender, EventArgs e)
+        private async void apacheStart_Clicked(object sender, EventArgs e)
         {
-            if (this.model.StartApache())
+            if (await this.model.StartApache())
             {
                 this.apacheStart.Enabled = false;
                 this.apacheStop.Enabled = true;
@@ -103,9 +104,9 @@ namespace PhpVersionSwitcher
             }
         }
 
-        private void apacheStop_Clicked(object sender, EventArgs e)
+        private async void apacheStop_Clicked(object sender, EventArgs e)
         {
-            if (this.model.StopApache())
+            if (await this.model.StopApache())
             {
                 this.apacheStart.Enabled = true;
                 this.apacheStop.Enabled = false;
@@ -113,9 +114,9 @@ namespace PhpVersionSwitcher
             }
         }
 
-        private void apacheRestart_Clicked(object sender, EventArgs e)
+        private async void apacheRestart_Clicked(object sender, EventArgs e)
         {
-            var success = this.model.StopApache() && this.model.StartApache();
+            var success = (await this.model.StopApache()) && (await this.model.StartApache());
         }
 
         private void refresh_Clicked(object sender, EventArgs e)

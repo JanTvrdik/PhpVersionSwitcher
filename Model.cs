@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.ServiceProcess;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace PhpVersionSwitcher
 {
@@ -84,38 +85,42 @@ namespace PhpVersionSwitcher
 			get { return this.phpDir + "\\versions"; }
 		}
 
-		public void SwitchTo(Version version)
+		public async Task SwitchTo(Version version)
 		{
-			if (!this.StopApache()) throw new ApacheStopFailedException();
+			if (!await this.StopApache()) throw new ApacheStopFailedException();
 			this.updateSymlink(version);
 			this.updatePhpIni(version);
-			if (!this.StartApache()) throw new ApacheStartFailedException();
+			if (!await this.StartApache()) throw new ApacheStartFailedException();
 		}
 
-		public bool StartApache()
+		public Task<bool> StartApache()
 		{
-			try
-			{
-				this.apache.Start();
-				this.apache.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(WAIT_TIME));
-			}
-			catch (System.ServiceProcess.TimeoutException) { }
-			catch (InvalidOperationException) { }
+			return Task.Run(() => {
+				try
+				{
+					this.apache.Start();
+					this.apache.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(WAIT_TIME));
+				}
+				catch (System.ServiceProcess.TimeoutException) { }
+				catch (InvalidOperationException) { }
 
-			return (this.apache.Status == ServiceControllerStatus.Running || this.apache.Status == ServiceControllerStatus.StartPending);
+				return (this.apache.Status == ServiceControllerStatus.Running || this.apache.Status == ServiceControllerStatus.StartPending);
+			});
 		}
 
-		public bool StopApache()
+		public Task<bool> StopApache()
 		{
-			try
-			{
-				this.apache.Stop();
-				this.apache.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(WAIT_TIME));
-			}
-			catch (System.ServiceProcess.TimeoutException) { }
-			catch (InvalidOperationException) { }
+			return Task.Run(() => {
+				try
+				{
+					this.apache.Stop();
+					this.apache.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(WAIT_TIME));
+				}
+				catch (System.ServiceProcess.TimeoutException) { }
+				catch (InvalidOperationException) { }
 
-			return (this.apache.Status == ServiceControllerStatus.Stopped || this.apache.Status == ServiceControllerStatus.StopPending);
+				return (this.apache.Status == ServiceControllerStatus.Stopped || this.apache.Status == ServiceControllerStatus.StopPending);
+			});			
 		}
 
 		private void updatePhpIni(Version version)
