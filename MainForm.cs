@@ -96,6 +96,7 @@ namespace PhpVersionSwitcher
 			finally
 			{
 				this.waitingForm.Hide();
+				this.updateApacheMenuState();
 				this.notifyIconMenu.Enabled = true;
 			}
 		}
@@ -117,7 +118,6 @@ namespace PhpVersionSwitcher
 			attempt(async () =>
 			{
 				await this.model.StartApache();
-				this.updateApacheMenuState();
 			});
 		}
 
@@ -126,7 +126,6 @@ namespace PhpVersionSwitcher
 			attempt(async () =>
 			{
 				await this.model.StopApache();
-				this.updateApacheMenuState();
 			});
 		}
 
@@ -134,8 +133,8 @@ namespace PhpVersionSwitcher
 		{
 			attempt(async () =>
 			{
-				var result = await this.model.StopApache() && await this.model.StartApache();
-				this.updateApacheMenuState();
+				await this.model.StartApache();
+				await this.model.StopApache();
 			});
 		}
 

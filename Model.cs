@@ -87,13 +87,29 @@ namespace PhpVersionSwitcher
 
 		public async Task SwitchTo(Version version)
 		{
-			if (!await this.StopApache()) throw new ApacheStopFailedException();
+			await StopApache();
 			this.updateSymlink(version);
 			this.updatePhpIni(version);
-			if (!await this.StartApache()) throw new ApacheStartFailedException();
+			await StartApache();
 		}
 
-		public Task<bool> StartApache()
+		public async Task StartApache()
+		{
+			if (!await this.TryStartApache())
+			{
+				throw new ApacheStartFailedException();
+			}
+		}
+
+		public async Task StopApache()
+		{
+			if (!await this.TryStopApache())
+			{
+				throw new ApacheStopFailedException();
+			}
+		}
+
+		public Task<bool> TryStartApache()
 		{
 			return Task.Run(() => {
 				try
@@ -108,7 +124,7 @@ namespace PhpVersionSwitcher
 			});
 		}
 
-		public Task<bool> StopApache()
+		public Task<bool> TryStopApache()
 		{
 			return Task.Run(() => {
 				try
