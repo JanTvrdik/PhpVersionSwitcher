@@ -171,24 +171,24 @@ namespace PhpVersionSwitcher
 			return this.VersionsDir + "\\" + version.ToString();
 		}
 	}
-}
 
-abstract class HttpServerFailedException : Exception
-{
-	public ServiceControllerStatus status;
-
-	HttpServerFailedException(ServiceControllerStatus status)
+	abstract class HttpServerFailedException : Exception
 	{
-		this.status = status;
+		public ServiceControllerStatus status;
+
+		HttpServerFailedException(ServiceControllerStatus status)
+		{
+			this.status = status;
+		}
 	}
-}
 
-class HttpServerStartFailedException : Exception
-{
+	class HttpServerStartFailedException : Exception
+	{
 
-}
+	}
 
-class HttpServerStopFailedException : Exception
-{
+	class HttpServerStopFailedException : Exception
+	{
 
+	}
 }
