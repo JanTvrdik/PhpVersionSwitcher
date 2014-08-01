@@ -95,7 +95,7 @@ namespace PhpVersionSwitcher
 
 		public async Task StartApache()
 		{
-			if (!await this.TryStartApache())
+			if (!await trySetApacheState(ServiceControllerStatus.Running, this.apache.Start))
 			{
 				throw new ApacheStartFailedException();
 			}
@@ -103,40 +103,27 @@ namespace PhpVersionSwitcher
 
 		public async Task StopApache()
 		{
-			if (!await this.TryStopApache())
+			if (!await trySetApacheState(ServiceControllerStatus.Stopped, this.apache.Stop))
 			{
 				throw new ApacheStopFailedException();
 			}
 		}
 
-		public Task<bool> TryStartApache()
+		private Task<bool> trySetApacheState(ServiceControllerStatus status, Action method)
 		{
-			return Task.Run(() => {
+			return Task.Run(() =>
+			{
 				try
 				{
-					this.apache.Start();
-					this.apache.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(WAIT_TIME));
+					method();
+					this.apache.WaitForStatus(status, TimeSpan.FromSeconds(WAIT_TIME));
 				}
 				catch (System.ServiceProcess.TimeoutException) { }
 				catch (InvalidOperationException) { }
 
-				return (this.apache.Status == ServiceControllerStatus.Running || this.apache.Status == ServiceControllerStatus.StartPending);
+				this.apache.Refresh();
+				return this.apache.Status == status;
 			});
-		}
-
-		public Task<bool> TryStopApache()
-		{
-			return Task.Run(() => {
-				try
-				{
-					this.apache.Stop();
-					this.apache.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(WAIT_TIME));
-				}
-				catch (System.ServiceProcess.TimeoutException) { }
-				catch (InvalidOperationException) { }
-
-				return (this.apache.Status == ServiceControllerStatus.Stopped || this.apache.Status == ServiceControllerStatus.StopPending);
-			});			
 		}
 
 		private void updatePhpIni(Version version)
