@@ -16,7 +16,6 @@ namespace PhpVersionSwitcher
 		public MainForm()
 		{
 			InitializeComponent();
-			this.notifyIcon.Icon = this.Icon;
 			this.model = new Model(Properties.Settings.Default.PhpDir, Properties.Settings.Default.HttpServerServiceName);
 			this.waitingForm = new WaitingForm();
 			this.initMainMenu();
