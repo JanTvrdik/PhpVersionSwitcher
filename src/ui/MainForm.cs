@@ -51,7 +51,7 @@ namespace PhpVersionSwitcher
 
 		private ToolStripMenuItem GetHttpServerMenu()
 		{
-			var menu = new ToolStripMenuItem(Properties.Settings.Default.HttpServerServiceName);
+			var menu = new ToolStripMenuItem(this.httpServer.ServiceName);
 			this.httpServerStart = menu.DropDownItems.Add("Start", null, this.httpServerStart_Clicked);
 			this.httpServerStop = menu.DropDownItems.Add("Stop", null, this.httpServerStop_Clicked);
 			this.httpServerRestart = menu.DropDownItems.Add("Restart", null, this.httpServerRestart_Clicked);
@@ -62,7 +62,7 @@ namespace PhpVersionSwitcher
 
 		private void UpdateHttpServerMenuState()
 		{
-			var running = this.httpServer.IsRunning();
+			bool running = this.httpServer.IsRunning();
 			this.httpServerStart.Enabled = !running;
 			this.httpServerStop.Enabled = running;
 			this.httpServerRestart.Enabled = running;
@@ -107,8 +107,8 @@ namespace PhpVersionSwitcher
 
 		private void version_Clicked(object sender, EventArgs e)
 		{
-			var menuItem = (ToolStripMenuItem)sender;
-			var version = (Version)menuItem.Tag;
+			var menuItem = (ToolStripMenuItem) sender;
+			var version = (Version) menuItem.Tag;
 
 			this.Attempt("PHP version to change", async () =>
 			{
@@ -119,26 +119,17 @@ namespace PhpVersionSwitcher
 
 		private void httpServerStart_Clicked(object sender, EventArgs e)
 		{
-			this.Attempt("HTTP server to start", async () =>
-			{
-				await this.httpServer.Start();
-			});
+			this.Attempt("HTTP server to start", this.httpServer.Start);
 		}
 
 		private void httpServerStop_Clicked(object sender, EventArgs e)
 		{
-			this.Attempt("HTTP server to stop", async () =>
-			{
-				await this.httpServer.Stop();
-			});
+			this.Attempt("HTTP server to stop", this.httpServer.Stop);
 		}
 
 		private void httpServerRestart_Clicked(object sender, EventArgs e)
 		{
-			this.Attempt("HTTP server to restart", async () =>
-			{
-				await this.httpServer.Restart();
-			});
+			this.Attempt("HTTP server to restart", this.httpServer.Restart);
 		}
 
 		private void refresh_Clicked(object sender, EventArgs e)

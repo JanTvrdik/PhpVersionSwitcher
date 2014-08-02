@@ -15,6 +15,11 @@ namespace PhpVersionSwitcher
 			this.service = new ServiceController(serviceName);
 		}
 
+		public string ServiceName
+		{
+			get { return this.service.ServiceName; }
+		}
+
 		public bool IsRunning()
 		{
 			return this.CheckStatus(ServiceControllerStatus.Running);
@@ -24,7 +29,7 @@ namespace PhpVersionSwitcher
 		{
 			if (!await this.TrySetStatus(ServiceControllerStatus.Running, this.service.Start))
 			{
-				throw new ServiceStartFailedException(this.service.ServiceName);
+				throw new ServiceStartFailedException(this.ServiceName);
 			}
 		}
 
@@ -32,7 +37,7 @@ namespace PhpVersionSwitcher
 		{
 			if (!await this.TrySetStatus(ServiceControllerStatus.Stopped, this.service.Stop))
 			{
-				throw new ServiceStopFailedException(this.service.ServiceName);
+				throw new ServiceStopFailedException(this.ServiceName);
 			}
 		}
 
