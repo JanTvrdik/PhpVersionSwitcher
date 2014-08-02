@@ -1,6 +1,6 @@
 ﻿# PhpVersionSwitcher
 
-![PhpVersionSwitcher screenshot](http://skladka.merxes.cz/img/phpversionswitcher.png)
+![PhpVersionSwitcher screenshot](http://skladka.merxes.cz/img/phpversionswitcher.png?v=2)
 
 
 ## Installation
@@ -9,7 +9,7 @@
 
 2. Update `PhpDir` and `HttpServerServiceName` options in `PhpVersionSwitcher.exe.config`
 
-3. Make sure the selected `PhpDir` has the following structure:
+3. Make sure the chosen `PhpDir` has the following structure:
 
 	```
 	%phpDir%/
