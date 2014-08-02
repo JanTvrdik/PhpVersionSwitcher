@@ -10,6 +10,7 @@ namespace PhpVersionSwitcher
 		private VersionsManager phpVersions;
 
 		private ToolStripMenuItem activeVersionItem;
+		private ToolStripMenuItem httpServerMenu;
 		private ToolStripItem httpServerStart;
 		private ToolStripItem httpServerStop;
 		private ToolStripItem httpServerRestart;
@@ -18,14 +19,15 @@ namespace PhpVersionSwitcher
 
 		public MainForm()
 		{
-			this.InitializeComponent();
 			this.httpServer = new ServiceManager(Properties.Settings.Default.HttpServerServiceName);
 			this.phpVersions = new VersionsManager(Properties.Settings.Default.PhpDir, this.httpServer);
 			this.waitingForm = new WaitingForm();
-			this.InitMainMenu();
+
+			this.InitializeComponent();
+			this.InitializeMainMenu();
 		}
 
-		private void InitMainMenu()
+		private void InitializeMainMenu()
 		{
 			var activeVersion = this.phpVersions.GetActive();
 			var versions = this.phpVersions.GetAvailable();
@@ -43,26 +45,23 @@ namespace PhpVersionSwitcher
 
 				this.notifyIconMenu.Items.Add(item);
 			}
-			this.notifyIconMenu.Items.Add(new ToolStripSeparator());
-			this.notifyIconMenu.Items.Add(this.GetHttpServerMenu());
-			this.notifyIconMenu.Items.Add("Refresh", null, this.refresh_Clicked);
-			this.notifyIconMenu.Items.Add("Close", null, this.close_Click);
-		}
 
-		private ToolStripMenuItem GetHttpServerMenu()
-		{
-			var menu = new ToolStripMenuItem(this.httpServer.ServiceName);
-			this.httpServerStart = menu.DropDownItems.Add("Start", null, this.httpServerStart_Clicked);
-			this.httpServerStop = menu.DropDownItems.Add("Stop", null, this.httpServerStop_Clicked);
-			this.httpServerRestart = menu.DropDownItems.Add("Restart", null, this.httpServerRestart_Clicked);
+			this.httpServerMenu = new ToolStripMenuItem(this.httpServer.ServiceName);
+			this.httpServerStart = this.httpServerMenu.DropDownItems.Add("Start", Properties.Resources.Start, this.httpServerStart_Clicked);
+			this.httpServerStop = this.httpServerMenu.DropDownItems.Add("Stop", Properties.Resources.Stop, this.httpServerStop_Clicked);
+			this.httpServerRestart = this.httpServerMenu.DropDownItems.Add("Restart", Properties.Resources.Restart, this.httpServerRestart_Clicked);
 			this.UpdateHttpServerMenuState();
 
-			return menu;
+			this.notifyIconMenu.Items.Add(new ToolStripSeparator());
+			this.notifyIconMenu.Items.Add(this.httpServerMenu);
+			this.notifyIconMenu.Items.Add("Refresh", null, this.refresh_Clicked);
+			this.notifyIconMenu.Items.Add("Close", null, this.close_Click);
 		}
 
 		private void UpdateHttpServerMenuState()
 		{
 			bool running = this.httpServer.IsRunning();
+			this.httpServerMenu.Image = running ? Properties.Resources.Start : Properties.Resources.Stop;
 			this.httpServerStart.Enabled = !running;
 			this.httpServerStop.Enabled = running;
 			this.httpServerRestart.Enabled = running;
@@ -134,7 +133,7 @@ namespace PhpVersionSwitcher
 
 		private void refresh_Clicked(object sender, EventArgs e)
 		{
-			this.InitMainMenu();
+			this.InitializeMainMenu();
 		}
 
 		private void close_Click(object sender, EventArgs e)

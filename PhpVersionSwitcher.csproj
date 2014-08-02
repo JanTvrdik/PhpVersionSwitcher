@@ -99,10 +99,6 @@
     <Compile Include="src\ui\WaitingForm.Designer.cs">
       <DependentUpon>WaitingForm.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
     <None Include="src\app.config" />
     <None Include="src\app.manifest" />
     <None Include="Properties\Settings.settings">
@@ -142,6 +138,21 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\Restart.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\Start.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\Stop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
