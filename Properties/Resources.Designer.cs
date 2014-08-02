@@ -63,9 +63,9 @@ namespace PhpVersionSwitcher.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon Icon {
+        internal static System.Drawing.Icon Globe {
             get {
-                object obj = ResourceManager.GetObject("Icon", resourceCulture);
+                object obj = ResourceManager.GetObject("Globe", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }

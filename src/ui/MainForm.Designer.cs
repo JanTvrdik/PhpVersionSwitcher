@@ -36,7 +36,7 @@
 			// notifyIcon
 			// 
 			this.notifyIcon.ContextMenuStrip = this.notifyIconMenu;
-			this.notifyIcon.Icon = global::PhpVersionSwitcher.Properties.Resources.Icon;
+			this.notifyIcon.Icon = global::PhpVersionSwitcher.Properties.Resources.Globe;
 			this.notifyIcon.Text = "PHP Version Switcher";
 			this.notifyIcon.Visible = true;
 			// 
