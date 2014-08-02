@@ -36,6 +36,12 @@ namespace PhpVersionSwitcher
 			}
 		}
 
+		public async Task Restart()
+		{
+			await this.Stop();
+			await this.Start();
+		}
+
 		private bool CheckStatus(ServiceControllerStatus status)
 		{
 			try

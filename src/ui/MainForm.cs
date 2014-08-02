@@ -137,8 +137,7 @@ namespace PhpVersionSwitcher
 		{
 			this.Attempt("HTTP server to restart", async () =>
 			{
-				await this.httpServer.Stop();
-				await this.httpServer.Start();
+				await this.httpServer.Restart();
 			});
 		}
 
