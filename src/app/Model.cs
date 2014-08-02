@@ -24,16 +24,22 @@ namespace PhpVersionSwitcher
 		public SortedSet<Version> GetAvailableVersions()
 		{
 			var versions = new SortedSet<Version>();
-			var dirs = Directory.EnumerateDirectories(this.VersionsDir);
-			foreach (var dir in dirs)
+
+			try
 			{
-				var info = new DirectoryInfo(dir);
-				Version version;
-				if (File.Exists(dir + "\\php.exe") && Version.TryParse(info.Name, out version))
+				var dirs = Directory.EnumerateDirectories(this.VersionsDir); // may throw exception
+				foreach (var dir in dirs)
 				{
-					versions.Add(version);
+					var info = new DirectoryInfo(dir);
+					Version version;
+					if (File.Exists(dir + "\\php.exe") && Version.TryParse(info.Name, out version))
+					{
+						versions.Add(version);
+					}
 				}
 			}
+			catch (SystemException) { }
+
 			return versions;
 		}
 
