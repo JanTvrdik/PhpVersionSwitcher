@@ -36,24 +36,22 @@
 			// notifyIcon
 			// 
 			this.notifyIcon.ContextMenuStrip = this.notifyIconMenu;
+			this.notifyIcon.Icon = global::PhpVersionSwitcher.Properties.Resources.Icon;
 			this.notifyIcon.Text = "PHP Version Switcher";
 			this.notifyIcon.Visible = true;
-			this.notifyIcon.Icon = Properties.Resources.Icon;
 			// 
 			// notifyIconMenu
 			// 
 			this.notifyIconMenu.Name = "notifyIconMenu";
-			this.notifyIconMenu.Size = new System.Drawing.Size(61, 4);
+			this.notifyIconMenu.Size = new System.Drawing.Size(153, 26);
 			// 
 			// MainForm
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(284, 262);
-			this.Enabled = false;
 			this.Name = "MainForm";
 			this.Text = "PHP Version Switcher";
 			this.ResumeLayout(false);
+
         }
 
         #endregion
