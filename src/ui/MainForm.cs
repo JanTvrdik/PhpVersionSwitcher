@@ -6,25 +6,29 @@ namespace PhpVersionSwitcher
 {
 	public partial class MainForm : Form
 	{
-		private Model model;
+		private ServiceManager httpServer;
+		private VersionsManager phpVersions;
+
 		private ToolStripMenuItem activeVersionItem;
 		private ToolStripItem httpServerStart;
 		private ToolStripItem httpServerStop;
 		private ToolStripItem httpServerRestart;
+
 		private WaitingForm waitingForm;
 
 		public MainForm()
 		{
 			this.InitializeComponent();
-			this.model = new Model(Properties.Settings.Default.PhpDir, Properties.Settings.Default.HttpServerServiceName);
+			this.httpServer = new ServiceManager(Properties.Settings.Default.HttpServerServiceName);
+			this.phpVersions = new VersionsManager(Properties.Settings.Default.PhpDir, this.httpServer);
 			this.waitingForm = new WaitingForm();
 			this.InitMainMenu();
 		}
 
 		private void InitMainMenu()
 		{
-			var activeVersion = this.model.GetActiveVersion();
-			var versions = this.model.GetAvailableVersions();
+			var activeVersion = this.phpVersions.GetActive();
+			var versions = this.phpVersions.GetAvailable();
 
 			this.notifyIconMenu.Items.Clear();
 			foreach (var version in versions)
@@ -58,7 +62,7 @@ namespace PhpVersionSwitcher
 
 		private void UpdateHttpServerMenuState()
 		{
-			var running = this.model.IsHttpServerRunning();
+			var running = this.httpServer.IsRunning();
 			this.httpServerStart.Enabled = !running;
 			this.httpServerStop.Enabled = running;
 			this.httpServerRestart.Enabled = running;
@@ -84,16 +88,14 @@ namespace PhpVersionSwitcher
 					await action();
 					break;
 				}
-				catch (HttpServerStartFailedException)
+				catch (ServiceStartFailedException ex)
 				{
-					var serviceName = Properties.Settings.Default.HttpServerServiceName;
-					var button = MessageBox.Show("Unable to start " + serviceName + " service.", "Operation failed", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
+					var button = MessageBox.Show("Unable to start " + ex.ServiceName + " service.", "Operation failed", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
 					if (button != DialogResult.Retry) break;
 				}
-				catch (HttpServerStopFailedException)
+				catch (ServiceStopFailedException ex)
 				{
-					var serviceName = Properties.Settings.Default.HttpServerServiceName;
-					var button = MessageBox.Show("Unable to stop " + serviceName + " service.", "Operation failed", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
+					var button = MessageBox.Show("Unable to stop " + ex.ServiceName + " service.", "Operation failed", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
 					if (button != DialogResult.Retry) break;
 				}
 			}
@@ -110,7 +112,7 @@ namespace PhpVersionSwitcher
 
 			this.Attempt("PHP version to change", async () =>
 			{
-				await this.model.SwitchTo(version);
+				await this.phpVersions.SwitchTo(version);
 				this.SetActiveItem(menuItem);
 			});
 		}
@@ -119,7 +121,7 @@ namespace PhpVersionSwitcher
 		{
 			this.Attempt("HTTP server to start", async () =>
 			{
-				await this.model.StartHttpServer();
+				await this.httpServer.Start();
 			});
 		}
 
@@ -127,7 +129,7 @@ namespace PhpVersionSwitcher
 		{
 			this.Attempt("HTTP server to stop", async () =>
 			{
-				await this.model.StopHttpServer();
+				await this.httpServer.Stop();
 			});
 		}
 
@@ -135,8 +137,8 @@ namespace PhpVersionSwitcher
 		{
 			this.Attempt("HTTP server to restart", async () =>
 			{
-				await this.model.StartHttpServer();
-				await this.model.StopHttpServer();
+				await this.httpServer.Stop();
+				await this.httpServer.Start();
 			});
 		}
 

@@ -1,27 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace PhpVersionSwitcher
 {
-	class Model
+	class VersionsManager
 	{
-		public const int WaitTime = 7;
-
 		private string phpBaseDir;
 
-		private ServiceController httpServer;
+		private ServiceManager httpServer;
 
-		public Model(string phpBaseDir, string httpServiceName)
+		public VersionsManager(string phpBaseDir, ServiceManager httpServiceManager)
 		{
 			this.phpBaseDir = phpBaseDir;
-			this.httpServer = new ServiceController(httpServiceName);
+			this.httpServer = httpServiceManager;
 		}
 
-		public SortedSet<Version> GetAvailableVersions()
+		public SortedSet<Version> GetAvailable()
 		{
 			var versions = new SortedSet<Version>();
 
@@ -43,7 +40,7 @@ namespace PhpVersionSwitcher
 			return versions;
 		}
 
-		public Version GetActiveVersion()
+		public Version GetActive()
 		{
 			try
 			{
@@ -59,33 +56,12 @@ namespace PhpVersionSwitcher
 			}
 		}
 
-		public bool IsHttpServerRunning()
-		{
-			return CheckHttpServerStatus(ServiceControllerStatus.Running);
-		}
-
 		public async Task SwitchTo(Version version)
 		{
-			await this.StopHttpServer();
+			await this.httpServer.Stop();
 			await this.UpdateSymlink(version);
 			await this.UpdatePhpIni(version);
-			await this.StartHttpServer();
-		}
-
-		public async Task StartHttpServer()
-		{
-			if (!await this.TrySetHttpServerState(ServiceControllerStatus.Running, this.httpServer.Start))
-			{
-				throw new HttpServerStartFailedException();
-			}
-		}
-
-		public async Task StopHttpServer()
-		{
-			if (!await this.TrySetHttpServerState(ServiceControllerStatus.Stopped, this.httpServer.Stop))
-			{
-				throw new HttpServerStopFailedException();
-			}
+			await this.httpServer.Start();
 		}
 
 		private string ActivePhpDir
@@ -106,35 +82,6 @@ namespace PhpVersionSwitcher
 		private string GetVersionDir(Version version)
 		{
 			return this.VersionsDir + "\\" + version;
-		}
-
-		private bool CheckHttpServerStatus(ServiceControllerStatus status)
-		{
-			try
-			{
-				this.httpServer.Refresh();
-				return this.httpServer.Status == status;
-			}
-			catch (InvalidOperationException)
-			{
-				return false;
-			}
-		}
-
-		private Task<bool> TrySetHttpServerState(ServiceControllerStatus status, Action method)
-		{
-			return Task.Run(() =>
-			{
-				try
-				{
-					method();
-					this.httpServer.WaitForStatus(status, TimeSpan.FromSeconds(WaitTime));
-				}
-				catch (System.ServiceProcess.TimeoutException) { }
-				catch (InvalidOperationException) { }
-
-				return CheckHttpServerStatus(status);
-			});
 		}
 
 		private Task UpdatePhpIni(Version version)
@@ -181,15 +128,5 @@ namespace PhpVersionSwitcher
 				Symlinks.CreateDir(symlink, target);
 			});
 		}
-	}
-
-	class HttpServerStartFailedException : Exception
-	{
-
-	}
-
-	class HttpServerStopFailedException : Exception
-	{
-
 	}
 }
