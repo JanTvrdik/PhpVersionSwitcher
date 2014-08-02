@@ -14,19 +14,20 @@
 	```
 	%phpDir%/
 	├── configurations/
-	│   ├── 5.x.x.ini # php.ini options for all 5.x.x versions
-	│   ├── 5.3.x.ini # php.ini options for all 5.3.x versions
-	│   ├── 5.3.7.ini # php.ini options specific for 5.3.7 version
+	│   ├── 5.x.x.ini        # php.ini options for all 5.x.x versions
+	│   ├── 5.3.x.ini        # php.ini options for all 5.3.x versions
+	│   ├── 5.3.7.ini        # php.ini options specific for 5.3.7 version
 	│   └── ...
 	└── versions/
-		├── 5.3.7/
-		│   ├── ext/
-		│   ├── ...
-		│   └── php.exe
-		└── 5.6.0-rc3/
-			├── ext/
-			├── ...
-			└── php.exe
+	    ├── 5.3.7/
+	    │   ├── ext/
+	    │   ├── ...
+	    │   └── php.exe
+	    ├── 5.6.0-rc3/
+	    │   ├── ext/
+	    │   ├── ...
+	    │   └── php.exe
+	    └── ...
 	```
 
 4. Create php.ini files in the `configurations` directory. In all php.ini files you can use `%phpDir%` variable. This is especially useful for `zend_extension`, e.g.
@@ -35,7 +36,7 @@
 	zend_extension = "%phpDir%\ext\php_xdebug.dll"
 	```
 
-5. The active PHP version is always simlinked to `%phpDir%\active`. You may want to add this directory to `PATH`.
+5. The active PHP version is always symlinked to `%phpDir%\active`. You may want to add this directory to `PATH`.
 
 6. Update configuration of your HTTP server. The Apache 2.4 configuration related to PHP may look like this:
 	```
@@ -43,7 +44,7 @@
 	PHPIniDir "C:/Web/Soft/PHP/active"
 	```
 
-7. Run `PhpVersionSwitcher.exe`.
+7. Run `PhpVersionSwitcher.exe`. Note that administrator rights are required because PhpVersionSwitcher needs to manage HTTP server service and symlink to active PHP version.
 
 
 ## License
