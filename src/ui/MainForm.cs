@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using PhpVersionSwitcher.Properties;
 
 namespace PhpVersionSwitcher
 {
@@ -19,8 +20,8 @@ namespace PhpVersionSwitcher
 
 		public MainForm()
 		{
-			this.httpServer = new ServiceManager(Properties.Settings.Default.HttpServerServiceName);
-			this.phpVersions = new VersionsManager(Properties.Settings.Default.PhpDir, this.httpServer);
+			this.httpServer = new ServiceManager(Settings.Default.HttpServerServiceName);
+			this.phpVersions = new VersionsManager(Settings.Default.PhpDir, this.httpServer);
 			this.waitingForm = new WaitingForm();
 
 			this.InitializeComponent();
@@ -47,9 +48,9 @@ namespace PhpVersionSwitcher
 			}
 
 			this.httpServerMenu = new ToolStripMenuItem(this.httpServer.ServiceName);
-			this.httpServerStart = this.httpServerMenu.DropDownItems.Add("Start", Properties.Resources.Start, this.httpServerStart_Clicked);
-			this.httpServerStop = this.httpServerMenu.DropDownItems.Add("Stop", Properties.Resources.Stop, this.httpServerStop_Clicked);
-			this.httpServerRestart = this.httpServerMenu.DropDownItems.Add("Restart", Properties.Resources.Restart, this.httpServerRestart_Clicked);
+			this.httpServerStart = this.httpServerMenu.DropDownItems.Add("Start", Resources.Start, this.httpServerStart_Clicked);
+			this.httpServerStop = this.httpServerMenu.DropDownItems.Add("Stop", Resources.Stop, this.httpServerStop_Clicked);
+			this.httpServerRestart = this.httpServerMenu.DropDownItems.Add("Restart", Resources.Restart, this.httpServerRestart_Clicked);
 			this.UpdateHttpServerMenuState();
 
 			this.notifyIconMenu.Items.Add(new ToolStripSeparator());
@@ -61,7 +62,7 @@ namespace PhpVersionSwitcher
 		private void UpdateHttpServerMenuState()
 		{
 			bool running = this.httpServer.IsRunning();
-			this.httpServerMenu.Image = running ? Properties.Resources.Start : Properties.Resources.Stop;
+			this.httpServerMenu.Image = running ? Resources.Start : Resources.Stop;
 			this.httpServerStart.Enabled = !running;
 			this.httpServerStop.Enabled = running;
 			this.httpServerRestart.Enabled = running;
