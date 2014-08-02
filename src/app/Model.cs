@@ -55,8 +55,7 @@ namespace PhpVersionSwitcher
 
 		public bool IsHttpServerRunning()
 		{
-			this.httpServer.Refresh();
-			return this.httpServer.Status == ServiceControllerStatus.Running;
+			return CheckHttpServerStatus(ServiceControllerStatus.Running);
 		}
 
 		public async Task SwitchTo(Version version)
@@ -103,6 +102,19 @@ namespace PhpVersionSwitcher
 			return this.VersionsDir + "\\" + version;
 		}
 
+		private bool CheckHttpServerStatus(ServiceControllerStatus status)
+		{
+			try
+			{
+				this.httpServer.Refresh();
+				return this.httpServer.Status == status;
+			}
+			catch (InvalidOperationException)
+			{
+				return false;
+			}
+		}
+
 		private Task<bool> TrySetHttpServerState(ServiceControllerStatus status, Action method)
 		{
 			return Task.Run(() =>
@@ -115,8 +127,7 @@ namespace PhpVersionSwitcher
 				catch (System.ServiceProcess.TimeoutException) { }
 				catch (InvalidOperationException) { }
 
-				this.httpServer.Refresh();
-				return this.httpServer.Status == status;
+				return CheckHttpServerStatus(status);
 			});
 		}
 
