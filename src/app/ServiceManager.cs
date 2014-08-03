@@ -29,7 +29,7 @@ namespace PhpVersionSwitcher
 		{
 			if (!await this.TrySetStatus(ServiceControllerStatus.Running, this.service.Start))
 			{
-				throw new ServiceStartFailedException(this.Name);
+				throw new ProcessException(this.Name, "start");
 			}
 		}
 
@@ -37,7 +37,7 @@ namespace PhpVersionSwitcher
 		{
 			if (!await this.TrySetStatus(ServiceControllerStatus.Stopped, this.service.Stop))
 			{
-				throw new ServiceStopFailedException(this.Name);
+				throw new ProcessException(this.Name, "stop");
 			}
 		}
 
@@ -74,30 +74,6 @@ namespace PhpVersionSwitcher
 
 				return this.CheckStatus(status);
 			});
-		}
-	}
-
-	abstract class ServiceException : Exception
-	{
-		public string ServiceName { get; private set; }
-
-		protected ServiceException(string serviceName)
-		{
-			this.ServiceName = serviceName;
-		}
-	}
-
-	class ServiceStartFailedException : ServiceException
-	{
-		public ServiceStartFailedException(string serviceName) : base(serviceName)
-		{
-		}
-	}
-
-	class ServiceStopFailedException : ServiceException
-	{
-		public ServiceStopFailedException(string serviceName) : base(serviceName)
-		{
 		}
 	}
 }

@@ -41,7 +41,7 @@ namespace PhpVersionSwitcher
 				}
 				catch
 				{
-					throw new ServiceStartFailedException(this.FileName);
+					throw new ProcessException(this.FileName, "start");
 				}
 			});
 		}
@@ -60,7 +60,7 @@ namespace PhpVersionSwitcher
 				}
 				catch { }
 
-				throw new ServiceStopFailedException(this.FileName);
+				throw new ProcessException(this.FileName, "stop");
 			});
 		}
 

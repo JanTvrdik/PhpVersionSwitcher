@@ -88,15 +88,10 @@ namespace PhpVersionSwitcher
 					await action();
 					break;
 				}
-				catch (ServiceStartFailedException ex)
+				catch (ProcessException ex)
 				{
-					var button = MessageBox.Show("Unable to start " + ex.ServiceName + " service.", "Operation failed", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
-					if (button != DialogResult.Retry) break;
-				}
-				catch (ServiceStopFailedException ex)
-				{
-					var button = MessageBox.Show("Unable to stop " + ex.ServiceName + " service.", "Operation failed", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
-					if (button != DialogResult.Retry) break;
+					var result = MessageBox.Show("Unable to " + ex.Operation + " " + ex.Name + ".", "Operation failed", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
+					if (result != DialogResult.Retry) break;
 				}
 			}
 
