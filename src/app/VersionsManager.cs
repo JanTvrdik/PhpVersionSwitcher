@@ -64,7 +64,7 @@ namespace PhpVersionSwitcher
 			await this.server.Start();
 		}
 
-		private string ActivePhpDir
+		public string ActivePhpDir
 		{
 			get { return this.phpBaseDir + "\\active"; }
 		}
