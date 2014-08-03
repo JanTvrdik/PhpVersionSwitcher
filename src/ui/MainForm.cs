@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using PhpVersionSwitcher.Properties;
@@ -7,22 +8,49 @@ namespace PhpVersionSwitcher
 {
 	public partial class MainForm : Form
 	{
-		private ServiceManager httpServer;
-		private VersionsManager phpVersions;
-
-		private ToolStripMenuItem activeVersionItem;
-		private ToolStripMenuItem httpServerMenu;
-		private ToolStripItem httpServerStart;
-		private ToolStripItem httpServerStop;
-		private ToolStripItem httpServerRestart;
-
+		private List<ProcessMenu> submenus;
 		private WaitingForm waitingForm;
+		private ToolStripMenuItem activeVersionItem;
+		private VersionsManager phpVersions;
 
 		public MainForm()
 		{
-			this.httpServer = new ServiceManager(Settings.Default.HttpServerServiceName);
-			this.phpVersions = new VersionsManager(Settings.Default.PhpDir, this.httpServer);
+			this.submenus = new List<ProcessMenu>();
 			this.waitingForm = new WaitingForm();
+
+			IProcessManager server = null;
+
+			try
+			{
+				if (Settings.Default.HttpServerServiceName.Trim().Length > 0)
+				{
+					server = new ServiceManager(Settings.Default.HttpServerServiceName);
+					this.submenus.Add(new ProcessMenu(this, server));
+				}
+
+				if (Settings.Default.HttpServerProcessPath.Trim().Length > 0)
+				{
+					server = new ProcessManager(Settings.Default.HttpServerProcessPath);
+					this.submenus.Add(new ProcessMenu(this, server));
+				}
+			
+				if (Settings.Default.FastCgiAddress.Trim().Length > 0)
+				{
+					server = new ProcessManager(Settings.Default.PhpDir + "\\active\\php-cgi.exe", "-b " + Settings.Default.FastCgiAddress);
+					this.submenus.Add(new ProcessMenu(this, server));
+				}
+			}
+			catch (Exception ex)
+			{
+				this.ShowFatalError("Something went wrong!\n" + ex.Message);
+			}
+
+			if (server == null)
+			{
+				this.ShowFatalError("At least one server must be set");
+			}
+
+			this.phpVersions = new VersionsManager(Settings.Default.PhpDir, server);
 
 			this.InitializeComponent();
 			this.InitializeMainMenu();
@@ -47,25 +75,16 @@ namespace PhpVersionSwitcher
 				this.notifyIconMenu.Items.Add(item);
 			}
 
-			this.httpServerMenu = new ToolStripMenuItem(this.httpServer.Name);
-			this.httpServerStart = this.httpServerMenu.DropDownItems.Add("Start", Resources.Start, this.httpServerStart_Clicked);
-			this.httpServerStop = this.httpServerMenu.DropDownItems.Add("Stop", Resources.Stop, this.httpServerStop_Clicked);
-			this.httpServerRestart = this.httpServerMenu.DropDownItems.Add("Restart", Resources.Restart, this.httpServerRestart_Clicked);
-			this.UpdateHttpServerMenuState();
+			this.notifyIconMenu.Items.Add(new ToolStripSeparator());
+
+			foreach (var menu in this.submenus)
+			{
+				this.notifyIconMenu.Items.Add(menu);
+			}
 
 			this.notifyIconMenu.Items.Add(new ToolStripSeparator());
-			this.notifyIconMenu.Items.Add(this.httpServerMenu);
 			this.notifyIconMenu.Items.Add("Refresh", null, this.refresh_Clicked);
 			this.notifyIconMenu.Items.Add("Close", null, this.close_Click);
-		}
-
-		private void UpdateHttpServerMenuState()
-		{
-			bool running = this.httpServer.IsRunning();
-			this.httpServerMenu.Image = running ? Resources.Start : Resources.Stop;
-			this.httpServerStart.Enabled = !running;
-			this.httpServerStop.Enabled = running;
-			this.httpServerRestart.Enabled = running;
 		}
 
 		private void SetActiveItem(ToolStripMenuItem item)
@@ -75,7 +94,7 @@ namespace PhpVersionSwitcher
 			this.activeVersionItem.Checked = true;
 		}
 
-		private async void Attempt(string description, Func<Task> action)
+		public async void Attempt(string description, Func<Task> action)
 		{
 			this.notifyIconMenu.Enabled = false;
 			this.waitingForm.description.Text = @"Waiting for " + description + @"...";
@@ -90,14 +109,28 @@ namespace PhpVersionSwitcher
 				}
 				catch (ProcessException ex)
 				{
-					var result = MessageBox.Show("Unable to " + ex.Operation + " " + ex.Name + ".", "Operation failed", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
-					if (result != DialogResult.Retry) break;
+					var dialogResult = MessageBox.Show("Unable to " + ex.Operation + " " + ex.Name + ".", "Operation failed", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
+					if (dialogResult != DialogResult.Retry) break;
 				}
 			}
-
-			this.UpdateHttpServerMenuState();
+			
+			this.RefreshSubMenus();
 			this.waitingForm.Hide();
 			this.notifyIconMenu.Enabled = true;
+		}
+
+		private void RefreshSubMenus()
+		{
+			foreach (var menu in this.submenus)
+			{
+				menu.Refresh();
+			}
+		}
+
+		private void ShowFatalError(string message)
+		{
+			MessageBox.Show(message, "Fatal error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			Application.Exit();
 		}
 
 		private void version_Clicked(object sender, EventArgs e)
@@ -110,21 +143,6 @@ namespace PhpVersionSwitcher
 				await this.phpVersions.SwitchTo(version);
 				this.SetActiveItem(menuItem);
 			});
-		}
-
-		private void httpServerStart_Clicked(object sender, EventArgs e)
-		{
-			this.Attempt("HTTP server to start", this.httpServer.Start);
-		}
-
-		private void httpServerStop_Clicked(object sender, EventArgs e)
-		{
-			this.Attempt("HTTP server to stop", this.httpServer.Stop);
-		}
-
-		private void httpServerRestart_Clicked(object sender, EventArgs e)
-		{
-			this.Attempt("HTTP server to restart", this.httpServer.Restart);
 		}
 
 		private void refresh_Clicked(object sender, EventArgs e)

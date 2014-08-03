@@ -40,5 +40,23 @@ namespace PhpVersionSwitcher.Properties {
                 return ((string)(this["HttpServerServiceName"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1:9999")]
+        public string FastCgiAddress {
+            get {
+                return ((string)(this["FastCgiAddress"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string HttpServerProcessPath {
+            get {
+                return ((string)(this["HttpServerProcessPath"]));
+            }
+        }
     }
 }

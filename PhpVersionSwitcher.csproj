@@ -84,6 +84,9 @@
     <Compile Include="src\app\IProcessManager.cs" />
     <Compile Include="src\app\ProcessManager.cs" />
     <Compile Include="src\exceptions\ProcessException.cs" />
+    <Compile Include="src\ui\ProcessMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="src\app\ServiceManager.cs" />
     <Compile Include="src\ui\MainForm.cs">
       <SubType>Form</SubType>

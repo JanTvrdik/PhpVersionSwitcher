@@ -12,10 +12,11 @@ namespace PhpVersionSwitcher
 		public string Arguments { get; private set; }
 		public string Name { get { return this.FileName.Replace(".exe", ""); }}
 
-		public ProcessManager(string workingDirectory, string fileName, string arguments)
+		public ProcessManager(string path, string arguments = "")
 		{
-			this.WorkingDirectory = workingDirectory;
-			this.FileName = fileName;
+			var info = new FileInfo(path);
+			this.WorkingDirectory = info.DirectoryName;
+			this.FileName = info.Name;
 			this.Arguments = arguments;
 		}
 
