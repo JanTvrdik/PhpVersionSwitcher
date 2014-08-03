@@ -82,6 +82,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="src\app\IProcessManager.cs" />
+    <Compile Include="src\app\ProcessManager.cs" />
     <Compile Include="src\app\ServiceManager.cs" />
     <Compile Include="src\ui\MainForm.cs">
       <SubType>Form</SubType>
