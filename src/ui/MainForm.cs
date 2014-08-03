@@ -47,7 +47,7 @@ namespace PhpVersionSwitcher
 				this.notifyIconMenu.Items.Add(item);
 			}
 
-			this.httpServerMenu = new ToolStripMenuItem(this.httpServer.ServiceName);
+			this.httpServerMenu = new ToolStripMenuItem(this.httpServer.Name);
 			this.httpServerStart = this.httpServerMenu.DropDownItems.Add("Start", Resources.Start, this.httpServerStart_Clicked);
 			this.httpServerStop = this.httpServerMenu.DropDownItems.Add("Stop", Resources.Stop, this.httpServerStop_Clicked);
 			this.httpServerRestart = this.httpServerMenu.DropDownItems.Add("Restart", Resources.Restart, this.httpServerRestart_Clicked);

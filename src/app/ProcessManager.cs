@@ -10,7 +10,7 @@ namespace PhpVersionSwitcher
 		public string WorkingDirectory { get; private set; }
 		public string FileName { get; private set; }
 		public string Arguments { get; private set; }
-		public string ProcessName { get { return this.FileName.Replace(".exe", ""); }}
+		public string Name { get { return this.FileName.Replace(".exe", ""); }}
 
 		public ProcessManager(string workingDirectory, string fileName, string arguments)
 		{
@@ -72,7 +72,7 @@ namespace PhpVersionSwitcher
 
 		private Process GetProcess()
 		{
-			var processes = Process.GetProcessesByName(this.ProcessName);
+			var processes = Process.GetProcessesByName(this.Name);
 			return processes.Length > 0 ? processes[0] : null;
 		}
 	}
