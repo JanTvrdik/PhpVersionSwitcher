@@ -30,7 +30,7 @@ namespace PhpVersionSwitcher
 			{
 				try
 				{
-					Process.Start(new ProcessStartInfo()
+					Process.Start(new ProcessStartInfo
 					{
 						WorkingDirectory = this.WorkingDirectory,
 						FileName = this.FileName,

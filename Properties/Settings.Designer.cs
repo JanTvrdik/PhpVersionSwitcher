@@ -25,15 +25,6 @@ namespace PhpVersionSwitcher.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Web\\Soft\\PHP")]
-        public string PhpDir {
-            get {
-                return ((string)(this["PhpDir"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Apache2.4")]
         public string HttpServerServiceName {
             get {
@@ -43,7 +34,16 @@ namespace PhpVersionSwitcher.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Web\\Soft\\Nginx\\nginx.exe")]
+        public string HttpServerProcessPath {
+            get {
+                return ((string)(this["HttpServerProcessPath"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1:9000")]
         public string FastCgiAddress {
             get {
                 return ((string)(this["FastCgiAddress"]));
@@ -52,10 +52,10 @@ namespace PhpVersionSwitcher.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string HttpServerProcessPath {
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Web\\Soft\\PHP")]
+        public string PhpDir {
             get {
-                return ((string)(this["HttpServerProcessPath"]));
+                return ((string)(this["PhpDir"]));
             }
         }
     }

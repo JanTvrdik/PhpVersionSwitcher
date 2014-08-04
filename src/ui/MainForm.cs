@@ -29,7 +29,7 @@ namespace PhpVersionSwitcher
 				{
 					this.processManagers.Add(new ProcessManager(Settings.Default.HttpServerProcessPath));
 				}
-			
+
 				if (Settings.Default.FastCgiAddress.Trim().Length > 0)
 				{
 					this.processManagers.Add(new ProcessManager(Settings.Default.PhpDir + "\\active\\php-cgi.exe", "-b " + Settings.Default.FastCgiAddress));
