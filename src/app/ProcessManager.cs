@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -22,7 +21,7 @@ namespace PhpVersionSwitcher
 
 		public bool IsRunning()
 		{
-			return this.GetProcess() != null;
+			return Process.GetProcessesByName(this.Name).Length > 0;
 		}
 
 		public Task Start()
@@ -51,17 +50,27 @@ namespace PhpVersionSwitcher
 		{
 			return Task.Run(() =>
 			{
+				var processes = Process.GetProcessesByName(this.Name);
+
 				try
 				{
-					var process = this.GetProcess();
-					if (process == null) return;
+					foreach (var process in processes)
+					{
+						process.Kill();
+					}
 
-					process.Kill();
-					if (process.WaitForExit(7000)) return;
+					foreach (var process in processes)
+					{
+						if (!process.WaitForExit(7000))
+						{
+							throw new ProcessException(this.FileName, "stop");
+						}
+					}
 				}
-				catch { }
-
-				throw new ProcessException(this.FileName, "stop");
+				catch
+				{
+					throw new ProcessException(this.FileName, "stop");
+				}
 			});
 		}
 
@@ -69,12 +78,6 @@ namespace PhpVersionSwitcher
 		{
 			await this.Stop();
 			await this.Start();
-		}
-
-		private Process GetProcess()
-		{
-			var processes = Process.GetProcessesByName(this.Name);
-			return processes.Length > 0 ? processes[0] : null;
 		}
 	}
 }
