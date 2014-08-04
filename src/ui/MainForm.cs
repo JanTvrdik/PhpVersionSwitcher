@@ -8,48 +8,37 @@ namespace PhpVersionSwitcher
 {
 	public partial class MainForm : Form
 	{
-		private List<ProcessMenu> processMenus;
-		private WaitingForm waitingForm;
+		private IList<IProcessManager> processManagers;
 		private VersionsManager phpVersions;
+		private WaitingForm waitingForm;
 
 		public MainForm()
 		{
-			this.processMenus = new List<ProcessMenu>();
+			this.processManagers = new List<IProcessManager>();
+			this.phpVersions = new VersionsManager(Settings.Default.PhpDir, this.processManagers);
 			this.waitingForm = new WaitingForm();
-
-			IProcessManager server = null;
 
 			try
 			{
 				if (Settings.Default.HttpServerServiceName.Trim().Length > 0)
 				{
-					server = new ServiceManager(Settings.Default.HttpServerServiceName);
-					this.RegisterProcessManager(server);
+					this.processManagers.Add(new ServiceManager(Settings.Default.HttpServerServiceName));
 				}
 
 				if (Settings.Default.HttpServerProcessPath.Trim().Length > 0)
 				{
-					server = new ProcessManager(Settings.Default.HttpServerProcessPath);
-					this.RegisterProcessManager(server);
+					this.processManagers.Add(new ProcessManager(Settings.Default.HttpServerProcessPath));
 				}
 			
 				if (Settings.Default.FastCgiAddress.Trim().Length > 0)
 				{
-					server = new ProcessManager(Settings.Default.PhpDir + "\\active\\php-cgi.exe", "-b " + Settings.Default.FastCgiAddress);
-					this.RegisterProcessManager(server);
+					this.processManagers.Add(new ProcessManager(Settings.Default.PhpDir + "\\active\\php-cgi.exe", "-b " + Settings.Default.FastCgiAddress));
 				}
 			}
 			catch (Exception ex)
 			{
 				this.ShowFatalError("Something went wrong!\n" + ex.Message);
 			}
-
-			if (server == null)
-			{
-				this.ShowFatalError("At least one server must be set");
-			}
-
-			this.phpVersions = new VersionsManager(Settings.Default.PhpDir, server);
 
 			this.InitializeComponent();
 			this.InitializeMainMenu();
@@ -75,23 +64,16 @@ namespace PhpVersionSwitcher
 
 			this.notifyIconMenu.Items.Add(new ToolStripSeparator());
 
-			foreach (var menu in this.processMenus)
+			foreach (var pm in this.processManagers)
 			{
-				menu.Refresh();
+				var menu = new ProcessMenu(pm);
+				menu.StartItem.Click += (sender, args) => this.Attempt(pm.Name + " to start", pm.Start);
+				menu.StopItem.Click += (sender, args) => this.Attempt(pm.Name + " to stop", pm.Stop);
+				menu.RestartItem.Click += (sender, args) => this.Attempt(pm.Name + " to restart", pm.Restart);
 				this.notifyIconMenu.Items.Add(menu);
 			}
 
 			this.notifyIconMenu.Items.Add("Close", null, (sender, args) => Application.Exit());
-		}
-
-		private void RegisterProcessManager(IProcessManager pm)
-		{
-			var menu = new ProcessMenu(pm);
-			menu.StartItem.Click += (sender, args) => this.Attempt(pm.Name + " to start", pm.Start);
-			menu.StopItem.Click += (sender, args) => this.Attempt(pm.Name + " to stop", pm.Stop);
-			menu.RestartItem.Click += (sender, args) => this.Attempt(pm.Name + " to restart", pm.Restart);
-
-			this.processMenus.Add(menu);
 		}
 
 		private async void Attempt(string description, Func<Task> action)

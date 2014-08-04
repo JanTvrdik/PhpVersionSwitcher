@@ -10,12 +10,12 @@ namespace PhpVersionSwitcher
 	{
 		private string phpBaseDir;
 
-		private IProcessManager server;
+		private IList<IProcessManager> serverManagers;
 
-		public VersionsManager(string phpBaseDir, IProcessManager serverManager)
+		public VersionsManager(string phpBaseDir, IList<IProcessManager> serverManagers)
 		{
 			this.phpBaseDir = phpBaseDir;
-			this.server = serverManager;
+			this.serverManagers = serverManagers;
 		}
 
 		public SortedSet<Version> GetAvailable()
@@ -58,10 +58,23 @@ namespace PhpVersionSwitcher
 
 		public async Task SwitchTo(Version version)
 		{
-			await this.server.Stop();
+			var running = new bool[this.serverManagers.Count];
+			for (var i = 0; i < this.serverManagers.Count; i++)
+			{
+				running[i] = this.serverManagers[i].IsRunning();
+				await this.serverManagers[i].Stop();
+			}
+
 			await this.UpdateSymlink(version);
 			await this.UpdatePhpIni(version);
-			await this.server.Start();
+
+			for (var i = 0; i < this.serverManagers.Count; i++)
+			{
+				if (running[i])
+				{
+					await this.serverManagers[i].Start();
+				}
+			}
 		}
 
 		public string ActivePhpDir
