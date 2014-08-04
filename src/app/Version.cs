@@ -90,5 +90,10 @@ namespace PhpVersionSwitcher
 
 			return sb.ToString();
 		}
+
+		public static implicit operator string(Version version)
+		{
+			return version.ToString();
+		}
 	}
 }
