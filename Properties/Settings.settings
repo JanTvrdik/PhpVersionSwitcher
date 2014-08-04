@@ -9,7 +9,7 @@
       <Value Profile="(Default)">Apache2.4</Value>
     </Setting>
     <Setting Name="FastCgiAddress" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">127.0.0.1:9999</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="HttpServerProcessPath" Type="System.String" Scope="Application">
       <Value Profile="(Default)" />
