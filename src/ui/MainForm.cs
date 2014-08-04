@@ -14,12 +14,12 @@ namespace PhpVersionSwitcher
 
 		public MainForm()
 		{
-			this.processManagers = new List<IProcessManager>();
-			this.phpVersions = new VersionsManager(Settings.Default.PhpDir, this.processManagers);
-			this.waitingForm = new WaitingForm();
-
 			try
 			{
+				this.processManagers = new List<IProcessManager>();
+				this.phpVersions = new VersionsManager(Settings.Default.PhpDir, this.processManagers);
+				this.waitingForm = new WaitingForm();
+
 				if (Settings.Default.HttpServerServiceName.Trim().Length > 0)
 				{
 					this.processManagers.Add(new ServiceManager(Settings.Default.HttpServerServiceName));
@@ -34,14 +34,15 @@ namespace PhpVersionSwitcher
 				{
 					this.processManagers.Add(new ProcessManager(Settings.Default.PhpDir + "\\active\\php-cgi.exe", "-b " + Settings.Default.FastCgiAddress));
 				}
+
+				this.InitializeComponent();
+				this.InitializeMainMenu();
 			}
 			catch (Exception ex)
 			{
-				this.ShowFatalError("Something went wrong!\n" + ex.Message);
+				MessageBox.Show("Something went wrong!\n" + ex.Message, "Fatal error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				Application.Exit();
 			}
-
-			this.InitializeComponent();
-			this.InitializeMainMenu();
 		}
 
 		private void InitializeMainMenu()
@@ -100,12 +101,6 @@ namespace PhpVersionSwitcher
 			this.InitializeMainMenu();
 			this.waitingForm.Hide();
 			this.notifyIconMenu.Enabled = true;
-		}
-
-		private void ShowFatalError(string message)
-		{
-			MessageBox.Show(message, "Fatal error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-			Application.Exit();
 		}
 	}
 }
