@@ -6,7 +6,7 @@ using Microsoft.Win32.SafeHandles;
 
 namespace PhpVersionSwitcher
 {
-    public static class Symlinks
+	internal static class Symlinks
     {
         private const int CreationDispositionOpenExisting = 3;
         private const int FileFlagBackupSemantics = 0x02000000;

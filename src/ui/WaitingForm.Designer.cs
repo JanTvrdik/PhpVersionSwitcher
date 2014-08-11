@@ -1,6 +1,6 @@
 ﻿namespace PhpVersionSwitcher
 {
-	partial class WaitingForm
+	internal partial class WaitingForm
 	{
 		/// <summary>
 		/// Required designer variable.

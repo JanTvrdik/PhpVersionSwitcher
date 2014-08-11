@@ -6,7 +6,7 @@ using PhpVersionSwitcher.Properties;
 
 namespace PhpVersionSwitcher
 {
-	public partial class MainForm : Form
+	internal partial class MainForm : Form
 	{
 		private IList<IProcessManager> processManagers;
 		private VersionsManager phpVersions;

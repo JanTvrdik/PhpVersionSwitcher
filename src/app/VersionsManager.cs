@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PhpVersionSwitcher
 {
-	class VersionsManager
+	internal class VersionsManager
 	{
 		private string phpBaseDir;
 

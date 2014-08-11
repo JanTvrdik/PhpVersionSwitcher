@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace PhpVersionSwitcher
 {
-	class ProcessManager : IProcessManager
+	internal class ProcessManager : IProcessManager
 	{
 		public string WorkingDirectory { get; private set; }
 		public string FileName { get; private set; }

@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace PhpVersionSwitcher
 {
-	public class Version : IComparable<Version>, IEquatable<Version>
+	internal class Version : IComparable<Version>, IEquatable<Version>
 	{
 		public enum VersionStability
 		{

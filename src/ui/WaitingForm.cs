@@ -2,7 +2,7 @@
 
 namespace PhpVersionSwitcher
 {
-	public partial class WaitingForm : Form
+	internal partial class WaitingForm : Form
 	{
 		public WaitingForm()
 		{

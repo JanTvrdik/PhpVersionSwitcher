@@ -1,6 +1,6 @@
 ﻿namespace PhpVersionSwitcher
 {
-    partial class MainForm
+	internal partial class MainForm
     {
         /// <summary>
         /// Required designer variable.

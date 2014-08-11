@@ -2,7 +2,7 @@
 
 namespace PhpVersionSwitcher
 {
-	interface IProcessManager
+	internal interface IProcessManager
 	{
 		string Name { get; }
 		bool IsRunning();

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace PhpVersionSwitcher
 {
-	class ServiceManager : IProcessManager
+	internal class ServiceManager : IProcessManager
 	{
 		public const int WaitTime = 7;
 
