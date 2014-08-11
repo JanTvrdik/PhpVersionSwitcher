@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using PhpVersionSwitcher.Properties;
 
 namespace PhpVersionSwitcher
 {
@@ -12,37 +11,14 @@ namespace PhpVersionSwitcher
 		private VersionsManager phpVersions;
 		private WaitingForm waitingForm;
 
-		public MainForm()
+		public MainForm(IList<IProcessManager> processManagers, VersionsManager phpVersions, WaitingForm waitingForm)
 		{
-			try
-			{
-				this.processManagers = new List<IProcessManager>();
-				this.phpVersions = new VersionsManager(Settings.Default.PhpDir, this.processManagers);
-				this.waitingForm = new WaitingForm();
+			this.processManagers = processManagers;
+			this.phpVersions = phpVersions;
+			this.waitingForm = waitingForm;
 
-				if (Settings.Default.HttpServerServiceName.Trim().Length > 0)
-				{
-					this.processManagers.Add(new ServiceManager(Settings.Default.HttpServerServiceName));
-				}
-
-				if (Settings.Default.HttpServerProcessPath.Trim().Length > 0)
-				{
-					this.processManagers.Add(new ProcessManager(Settings.Default.HttpServerProcessPath));
-				}
-
-				if (Settings.Default.FastCgiAddress.Trim().Length > 0)
-				{
-					this.processManagers.Add(new ProcessManager(Settings.Default.PhpDir + "\\active\\php-cgi.exe", "-b " + Settings.Default.FastCgiAddress));
-				}
-
-				this.InitializeComponent();
-				this.InitializeMainMenu();
-			}
-			catch (Exception ex)
-			{
-				MessageBox.Show("Something went wrong!\n" + ex.Message, "Fatal error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				Application.Exit();
-			}
+			this.InitializeComponent();
+			this.InitializeMainMenu();
 		}
 
 		private void InitializeMainMenu()
