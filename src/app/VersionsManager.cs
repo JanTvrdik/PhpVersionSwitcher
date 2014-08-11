@@ -84,7 +84,7 @@ namespace PhpVersionSwitcher
 
 		private string ConfigurationDir
 		{
-			get { return this.phpBaseDir + "\\configuration"; }
+			get { return this.phpBaseDir + "\\configurations"; }
 		}
 
 		private string VersionsDir
