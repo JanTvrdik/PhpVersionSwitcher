@@ -58,7 +58,7 @@
 3. Update Nginx configuration to contain something like this:
 	```
 	location ~ \.php$ {
-		fastcgi_pass   127.0.0.1:9000;
+		fastcgi_pass   127.0.0.1:9090;
 		fastcgi_index  index.php;
 		fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
 		include        fastcgi_params;
