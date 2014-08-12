@@ -76,18 +76,17 @@ namespace PhpVersionSwitcher
 				}
 			}
 
-			foreach (var server in this.serverManagers)
-			{
-				await server.Stop();
-			}
+			await Task.WhenAll(this.serverManagers
+				.Select(server => server.Stop())
+			);
 
 			await this.UpdateSymlink(version);
 			await this.UpdatePhpIni(version);
 
-			foreach (var server in this.serverManagers.Where((server, i) => this.running[i]))
-			{
-				await server.Start();
-			}
+			await Task.WhenAll(this.serverManagers
+				.Where((server, i) => this.running[i])
+				.Select(server => server.Start())
+			);
 
 			this.switchToSuccess = true;
 		}
