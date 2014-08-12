@@ -1,4 +1,4 @@
-﻿# PhpVersionSwitcher
+# PhpVersionSwitcher
 
 ![PhpVersionSwitcher screenshot](http://skladka.merxes.cz/img/phpversionswitcher.png?v=2)
 
@@ -7,10 +7,7 @@
 
 1. Download and extract a [release archive](https://github.com/JanTvrdik/PhpVersionSwitcher/releases) to directory of your choice
 
-2. Update `PhpDir` and `HttpServerServiceName` options in `PhpVersionSwitcher.exe.config`
-
-3. Make sure the chosen `PhpDir` has the following structure:
-
+2. Create a base directory for PHP with the following structure:
 	```
 	%phpDir%/
 	├── configurations/
@@ -30,21 +27,43 @@
 	    └── ...
 	```
 
-4. Create php.ini files in the `configurations` directory. In all php.ini files you can use `%phpDir%` variable. This is especially useful for `zend_extension`, e.g.
+3. Create php.ini files in the `configurations` directory. In all php.ini files you can use `%phpDir%` variable. This is especially useful for `zend_extension`, e.g.
 	```
 	zend_extension = "%phpDir%\ext\php_opcache.dll"
 	zend_extension = "%phpDir%\ext\php_xdebug.dll"
 	```
 
-5. The active PHP version is always symlinked to `%phpDir%\active`. You may want to add this directory to `PATH`.
+4. The active PHP version is always symlinked to `%phpDir%\active`. You may want to add this directory to `PATH`.
 
-6. Update configuration of your HTTP server. The Apache 2.4 configuration related to PHP may look like this:
+5. Update `PhpDir` option in `PhpVersionSwitcher.exe.config` to contain path to base PHP directory.
+
+
+### Apache + PHP module
+
+1. Update `HttpServerServiceName` option in `PhpVersionSwitcher.exe.config` to contain name of Apache service.
+
+2. Update Apache configuration to contain something like this:
 	```
 	LoadModule php5_module "C:/Web/Soft/PHP/active/php5apache2_4.dll"
 	PHPIniDir "C:/Web/Soft/PHP/active"
+	AddHandler application/x-httpd-php .php
 	```
 
-7. Run `PhpVersionSwitcher.exe`. Note that administrator rights are required because PhpVersionSwitcher needs to manage HTTP server service and symlink to active PHP version.
+### Nginx + PHP FastCGI
+
+1. Update `HttpServerProcessPath` option in `PhpVersionSwitcher.exe.config` to contain path to `nginx.exe`.
+
+2. Update `FastCgiAddress` option in `PhpVersionSwitcher.exe.config` to contain IP address + port which FastCGI should bind to.
+
+3. Update Nginx configuration to contain something like this:
+	```
+	location ~ \.php$ {
+		fastcgi_pass   127.0.0.1:9000;
+		fastcgi_index  index.php;
+		fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+		include        fastcgi_params;
+	}
+	```
 
 
 ## License
