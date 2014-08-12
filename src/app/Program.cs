@@ -20,8 +20,6 @@ namespace PhpVersionSwitcher
 
 				var settings = Settings.Default;
 				var processManagers = new List<IProcessManager>();
-				var phpVersions = new VersionsManager(settings.PhpDir, processManagers);
-				var waitingForm = new WaitingForm();
 
 				if (settings.HttpServerServiceName.Trim().Length > 0)
 				{
@@ -38,6 +36,8 @@ namespace PhpVersionSwitcher
 					processManagers.Add(new ProcessManager(settings.PhpDir + "\\active\\php-cgi.exe", "-b " + settings.FastCgiAddress));
 				}
 
+				var phpVersions = new VersionsManager(settings.PhpDir, processManagers);
+				var waitingForm = new WaitingForm();
 				new MainForm(processManagers, phpVersions, waitingForm);
 				Application.Run();
 			}
