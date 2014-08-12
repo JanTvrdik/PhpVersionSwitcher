@@ -31,7 +31,7 @@ namespace PhpVersionSwitcher
 			{
 				try
 				{
-					Process.Start(new ProcessStartInfo
+					var process = Process.Start(new ProcessStartInfo
 					{
 						WorkingDirectory = this.WorkingDirectory,
 						FileName = this.FileName,
@@ -39,6 +39,11 @@ namespace PhpVersionSwitcher
 						CreateNoWindow = true,
 						WindowStyle = ProcessWindowStyle.Hidden,
 					});
+
+					if (process != null && process.WaitForExit(1000))
+					{
+						throw new ProcessException(this.Name, "start");
+					}
 				}
 				catch
 				{
