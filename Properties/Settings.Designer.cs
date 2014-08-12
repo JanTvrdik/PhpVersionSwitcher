@@ -58,5 +58,23 @@ namespace PhpVersionSwitcher.Properties {
                 return ((string)(this["PhpDir"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string PhpServerDocumentRoot {
+            get {
+                return ((string)(this["PhpServerDocumentRoot"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string PhpServerAddress {
+            get {
+                return ((string)(this["PhpServerAddress"]));
+            }
+        }
     }
 }
