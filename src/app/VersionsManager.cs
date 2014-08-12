@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,10 +13,16 @@ namespace PhpVersionSwitcher
 
 		private IList<IProcessManager> serverManagers;
 
+		private bool[] running;
+
+		private bool switchToSuccess;
+
 		public VersionsManager(string phpBaseDir, IList<IProcessManager> serverManagers)
 		{
 			this.phpBaseDir = phpBaseDir;
 			this.serverManagers = serverManagers;
+			this.running = new bool[serverManagers.Count];
+			this.switchToSuccess = true;
 		}
 
 		public SortedSet<Version> GetAvailable()
@@ -58,23 +65,31 @@ namespace PhpVersionSwitcher
 
 		public async Task SwitchTo(Version version)
 		{
-			var running = new bool[this.serverManagers.Count];
-			for (var i = 0; i < this.serverManagers.Count; i++)
+			var updateState = this.switchToSuccess;
+			this.switchToSuccess = false;
+
+			if (updateState)
 			{
-				running[i] = this.serverManagers[i].IsRunning();
-				await this.serverManagers[i].Stop();
+				for (var i = 0; i < this.serverManagers.Count; i++)
+				{
+					this.running[i] = this.serverManagers[i].IsRunning();
+				}
+			}
+
+			foreach (var server in this.serverManagers)
+			{
+				await server.Stop();
 			}
 
 			await this.UpdateSymlink(version);
 			await this.UpdatePhpIni(version);
 
-			for (var i = 0; i < this.serverManagers.Count; i++)
+			foreach (var server in this.serverManagers.Where((server, i) => this.running[i]))
 			{
-				if (running[i])
-				{
-					await this.serverManagers[i].Start();
-				}
+				await server.Start();
 			}
+
+			this.switchToSuccess = true;
 		}
 
 		public string ActivePhpDir
