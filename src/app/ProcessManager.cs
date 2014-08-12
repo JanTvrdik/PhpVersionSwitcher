@@ -6,22 +6,23 @@ namespace PhpVersionSwitcher
 {
 	internal class ProcessManager : IProcessManager
 	{
+		public string Name { get; private set; }
 		public string WorkingDirectory { get; private set; }
 		public string FileName { get; private set; }
 		public string Arguments { get; private set; }
-		public string Name { get { return this.FileName.Replace(".exe", ""); }}
 
-		public ProcessManager(string path, string arguments = "")
+		public ProcessManager(string path, string arguments = "", string name = null)
 		{
 			var info = new FileInfo(path);
 			this.WorkingDirectory = info.DirectoryName;
 			this.FileName = info.Name;
 			this.Arguments = arguments;
+			this.Name = name ?? info.Name;
 		}
 
 		public bool IsRunning()
 		{
-			return Process.GetProcessesByName(this.Name).Length > 0;
+			return this.GetProcesses().Length > 0;
 		}
 
 		public Task Start()
@@ -41,7 +42,7 @@ namespace PhpVersionSwitcher
 				}
 				catch
 				{
-					throw new ProcessException(this.FileName, "start");
+					throw new ProcessException(this.Name, "start");
 				}
 			});
 		}
@@ -50,7 +51,7 @@ namespace PhpVersionSwitcher
 		{
 			return Task.Run(() =>
 			{
-				var processes = Process.GetProcessesByName(this.Name);
+				var processes = this.GetProcesses();
 
 				try
 				{
@@ -78,6 +79,11 @@ namespace PhpVersionSwitcher
 		{
 			await this.Stop();
 			await this.Start();
+		}
+
+		private Process[] GetProcesses()
+		{
+			return Process.GetProcessesByName(this.FileName.Replace(".exe", ""));
 		}
 	}
 }
