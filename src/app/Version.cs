@@ -14,13 +14,14 @@ namespace PhpVersionSwitcher
 			Stable = 3
 		};
 
-		public Version(int major, int minor, int patch, VersionStability stability, int stabilityVersion)
+		public Version(int major, int minor, int patch, VersionStability stability, int stabilityVersion, string label)
 		{
 			this.Major = major;
 			this.Minor = minor;
 			this.Patch = patch;
 			this.Stability = stability;
 			this.StabilityVersion = stabilityVersion;
+			this.Label = label;
 		}
 
 		public int Major { get; private set; }
@@ -32,6 +33,8 @@ namespace PhpVersionSwitcher
 		public VersionStability Stability { get; private set; }
 
 		public int StabilityVersion { get; private set; }
+
+		public string Label { get; private set; }
 
 		public int CompareTo(Version other)
 		{
@@ -47,9 +50,9 @@ namespace PhpVersionSwitcher
 			return other != null && this.CompareTo(other) == 0;
 		}
 
-		public static bool TryParse(string s, out Version version)
+		public static bool TryParse(string label, out Version version)
 		{
-			Match match = Regex.Match(s, @"^(\d+)\.(\d+)\.(\d+)(?:-(alpha|beta|rc)(\d+))?$");
+			Match match = Regex.Match(label, @"^(\d+)\.(\d+)\.(\d+)(?:-(alpha|beta|rc)(\d+))?", RegexOptions.IgnoreCase);
 			if (!match.Success)
 			{
 				version = null;
@@ -64,36 +67,12 @@ namespace PhpVersionSwitcher
 
 			if (match.Groups[4].Success)
 			{
-				stability = (VersionStability) Enum.Parse(typeof (VersionStability), match.Groups[4].Value, true);
+				stability = (VersionStability) Enum.Parse(typeof(VersionStability), match.Groups[4].Value, true);
 				stabilityVersion = Int32.Parse(match.Groups[5].Value);
 			}
 
-			version = new Version(major, minor, patch, stability, stabilityVersion);
+			version = new Version(major, minor, patch, stability, stabilityVersion, label);
 			return true;
-		}
-
-		public override string ToString()
-		{
-			var sb = new StringBuilder();
-			sb.Append(this.Major);
-			sb.Append('.');
-			sb.Append(this.Minor);
-			sb.Append('.');
-			sb.Append(this.Patch);
-
-			if (this.Stability != VersionStability.Stable)
-			{
-				sb.Append('-');
-				sb.Append(this.Stability.ToString().ToLower());
-				sb.Append(this.StabilityVersion);
-			}
-
-			return sb.ToString();
-		}
-
-		public static implicit operator string(Version version)
-		{
-			return version.ToString();
 		}
 	}
 }

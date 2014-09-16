@@ -108,7 +108,7 @@ namespace PhpVersionSwitcher
 
 		private string GetVersionDir(Version version)
 		{
-			return this.VersionsDir + "\\" + version;
+			return this.VersionsDir + "\\" + version.Label;
 		}
 
 		private Task UpdatePhpIni(Version version)

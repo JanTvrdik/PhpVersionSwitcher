@@ -30,7 +30,7 @@ namespace PhpVersionSwitcher
 
 			foreach (var version in versions)
 			{
-				var item = new ToolStripMenuItem(version);
+				var item = new ToolStripMenuItem(version.Label);
 				item.Checked = version.Equals(activeVersion);
 				item.Click += (sender, args) => this.Attempt("PHP version to change", async () =>
 				{
