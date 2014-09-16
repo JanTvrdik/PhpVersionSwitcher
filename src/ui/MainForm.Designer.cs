@@ -39,11 +39,12 @@
 			this.notifyIcon.Icon = global::PhpVersionSwitcher.Properties.Resources.Globe;
 			this.notifyIcon.Text = "PHP Version Switcher";
 			this.notifyIcon.Visible = true;
+			this.notifyIcon.MouseUp += new System.Windows.Forms.MouseEventHandler(this.notifyIcon_MouseUp);
 			// 
 			// notifyIconMenu
 			// 
 			this.notifyIconMenu.Name = "notifyIconMenu";
-			this.notifyIconMenu.Size = new System.Drawing.Size(153, 26);
+			this.notifyIconMenu.Size = new System.Drawing.Size(61, 4);
 			// 
 			// MainForm
 			// 

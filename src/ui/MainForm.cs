@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -79,6 +80,16 @@ namespace PhpVersionSwitcher
 			this.InitializeMainMenu();
 			this.waitingForm.Hide();
 			this.notifyIconMenu.Enabled = true;
+		}
+
+		private void notifyIcon_MouseUp(object sender, MouseEventArgs e)
+		{
+			if (e.Button == MouseButtons.Left)
+			{
+				// reflection hack, see http://stackoverflow.com/questions/2208690/invoke-notifyicons-context-menu
+				MethodInfo method = typeof(NotifyIcon).GetMethod("ShowContextMenu", BindingFlags.Instance | BindingFlags.NonPublic);
+				method.Invoke(sender, null);
+			}
 		}
 	}
 }
