@@ -15,10 +15,10 @@
       <Value Profile="(Default)">C:\Web\Soft\PHP</Value>
     </Setting>
     <Setting Name="PhpServerDocumentRoot" Type="System.String" Scope="Application">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">C:\Web\Projects</Value>
     </Setting>
     <Setting Name="PhpServerAddress" Type="System.String" Scope="Application">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">127.0.0.1:8080</Value>
     </Setting>
   </Settings>
 </SettingsFile>
