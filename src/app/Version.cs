@@ -8,10 +8,11 @@ namespace PhpVersionSwitcher
 	{
 		public enum VersionStability
 		{
-			Alpha = 0,
-			Beta = 1,
-			RC = 2,
-			Stable = 3
+			Dev = 0,
+			Alpha = 1,
+			Beta = 2,
+			RC = 3,
+			Stable = 4
 		};
 
 		public Version(int major, int minor, int patch, VersionStability stability, int stabilityVersion, string label)
@@ -52,7 +53,7 @@ namespace PhpVersionSwitcher
 
 		public static bool TryParse(string label, out Version version)
 		{
-			Match match = Regex.Match(label, @"^(\d+)\.(\d+)\.(\d+)(?:-(alpha|beta|rc)(\d+))?", RegexOptions.IgnoreCase);
+			Match match = Regex.Match(label, @"^(\d+)\.(\d+)\.(\d+)(?:-(dev|(alpha|beta|rc)(\d+)))?", RegexOptions.IgnoreCase);
 			if (!match.Success)
 			{
 				version = null;
@@ -65,10 +66,14 @@ namespace PhpVersionSwitcher
 			var stability = VersionStability.Stable;
 			var stabilityVersion = 0;
 
-			if (match.Groups[4].Success)
+			if (match.Groups[5].Success)
 			{
-				stability = (VersionStability) Enum.Parse(typeof(VersionStability), match.Groups[4].Value, true);
-				stabilityVersion = Int32.Parse(match.Groups[5].Value);
+				stability = (VersionStability) Enum.Parse(typeof(VersionStability), match.Groups[5].Value, true);
+				stabilityVersion = Int32.Parse(match.Groups[6].Value);
+			}
+			else if (match.Groups[4].Success)
+			{
+				stability = VersionStability.Dev;
 			}
 
 			version = new Version(major, minor, patch, stability, stabilityVersion, label);
