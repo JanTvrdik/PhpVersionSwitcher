@@ -65,6 +65,12 @@
 	}
 	```
 
+### PHP built-in server
+
+1. Update `PhpServerDocumentRoot` option in `PhpVersionSwitcher.exe.config` to contain path document root.
+
+2. Update `PhpServerAddress` option in `PhpVersionSwitcher.exe.config` to contain IP address + port which PHP built-in server should bind to.
+
 
 ## License
 
