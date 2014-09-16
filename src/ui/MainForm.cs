@@ -50,6 +50,8 @@ namespace PhpVersionSwitcher
 				this.notifyIconMenu.Items.Add(menu);
 			}
 
+			this.notifyIconMenu.Items.Add(new ToolStripSeparator());
+			this.notifyIconMenu.Items.Add("Refresh", null, (sender, args) => this.InitializeMainMenu());
 			this.notifyIconMenu.Items.Add("Close", null, (sender, args) => Application.Exit());
 		}
 
