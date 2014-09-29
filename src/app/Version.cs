@@ -43,7 +43,8 @@ namespace PhpVersionSwitcher
 			if (this.Minor != other.Minor) return this.Minor - other.Minor;
 			if (this.Patch != other.Patch) return this.Patch - other.Patch;
 			if (this.Stability != other.Stability) return this.Stability - other.Stability;
-			return this.StabilityVersion - other.StabilityVersion;
+			if (this.StabilityVersion != other.StabilityVersion) return this.StabilityVersion - other.StabilityVersion;
+			return this.Label.CompareTo(other.Label);
 		}
 
 		public bool Equals(Version other)
