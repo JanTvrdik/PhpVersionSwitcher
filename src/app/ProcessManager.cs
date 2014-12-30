@@ -1,6 +1,9 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Management;
+using System;
 
 namespace PhpVersionSwitcher
 {
@@ -22,7 +25,7 @@ namespace PhpVersionSwitcher
 
 		public bool IsRunning()
 		{
-			return this.GetProcesses().Length > 0;
+			return this.GetProcess() != null;
 		}
 
 		public Task Start()
@@ -56,21 +59,18 @@ namespace PhpVersionSwitcher
 		{
 			return Task.Run(() =>
 			{
-				var processes = this.GetProcesses();
+				var process = this.GetProcess();
+				if (process == null)
+				{
+					return;
+				}
 
 				try
 				{
-					foreach (var process in processes)
+					process.Kill();
+					if (!process.WaitForExit(7000))
 					{
-						process.Kill();
-					}
-
-					foreach (var process in processes)
-					{
-						if (!process.WaitForExit(7000))
-						{
-							throw new ProcessException(this.FileName, "stop");
-						}
+						throw new ProcessException(this.FileName, "stop");
 					}
 				}
 				catch
@@ -86,9 +86,23 @@ namespace PhpVersionSwitcher
 			await this.Start();
 		}
 
-		private Process[] GetProcesses()
+		private Process GetProcess()
 		{
-			return Process.GetProcessesByName(this.FileName.Replace(".exe", ""));
+			string wmiQuery = string.Format("select CommandLine, ProcessId from Win32_Process where Name='{0}'", this.FileName);
+			ManagementObjectCollection managementObjects = (new ManagementObjectSearcher(wmiQuery)).Get();
+
+			foreach (ManagementObject managementObject in managementObjects)
+			{
+				string line = (string) (managementObject["CommandLine"]);
+				if (line != null && line.Contains(this.Arguments))
+				{
+					var pId = Convert.ToInt32(managementObject["ProcessId"]);
+					return Process.GetProcessById(pId);
+				}
+			}
+
+			return null;
 		}
+
 	}
 }
