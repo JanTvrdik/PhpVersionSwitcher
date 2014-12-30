@@ -81,6 +81,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Settings.cs" />
     <Compile Include="src\app\IProcessManager.cs" />
     <Compile Include="src\app\ProcessManager.cs" />
     <Compile Include="src\exceptions\ProcessException.cs" />
