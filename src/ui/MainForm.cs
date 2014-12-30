@@ -42,6 +42,7 @@ namespace PhpVersionSwitcher
 			}
 
 			this.notifyIconMenu.Items.Add(new ToolStripSeparator());
+			var menuGroups = new Dictionary<string, List<ProcessMenu> >();
 
 			var running = false;
 			foreach (var pm in this.processManagers)
@@ -55,7 +56,20 @@ namespace PhpVersionSwitcher
 					running = true;
 				}
 
-				this.notifyIconMenu.Items.Add(menu);
+				if (pm.GroupName != null)
+				{
+					if (!menuGroups.ContainsKey(pm.GroupName)) menuGroups.Add(pm.GroupName, new List<ProcessMenu>());
+					menuGroups[pm.GroupName].Add(menu);
+				}
+				else
+				{
+					this.notifyIconMenu.Items.Add(menu);
+				}
+			}
+
+			foreach (var pair in menuGroups)
+			{
+				this.notifyIconMenu.Items.Add(new ProcessMenuGroup(pair.Key, pair.Value));
 			}
 
 			this.notifyIconMenu.Items.Add(new ToolStripSeparator());

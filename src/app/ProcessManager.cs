@@ -13,14 +13,16 @@ namespace PhpVersionSwitcher
 		public string WorkingDirectory { get; private set; }
 		public string FileName { get; private set; }
 		public string Arguments { get; private set; }
+		public string GroupName { get; private set; }
 
-		public ProcessManager(string path, string arguments = "", string name = null)
+		public ProcessManager(string path, string arguments = "", string name = null, string groupName = null)
 		{
 			var info = new FileInfo(path);
 			this.WorkingDirectory = info.DirectoryName;
 			this.FileName = info.Name;
 			this.Arguments = arguments;
 			this.Name = name ?? info.Name;
+			this.GroupName = groupName;
 		}
 
 		public bool IsRunning()

@@ -101,6 +101,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\app\Symlinks.cs" />
     <Compile Include="src\app\Version.cs" />
+    <Compile Include="src\ui\ProcessMenuGroup.cs">
+      <SubType>component</SubType>
+    </Compile>
     <Compile Include="src\ui\WaitingForm.cs">
       <SubType>Form</SubType>
     </Compile>

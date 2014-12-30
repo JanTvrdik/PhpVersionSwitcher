@@ -39,7 +39,7 @@ namespace PhpVersionSwitcher
 				{
 					foreach (var FastCgiAddress in settings.FastCgiAddresses)
 					{
-						processManagers.Add(new ProcessManager(settings.PhpDir + "\\active\\php-cgi.exe", "-b " + FastCgiAddress.Trim(), "PHP FastCGI (" + FastCgiAddress.Substring(FastCgiAddress.IndexOf(':') + 1) + ")"));
+						processManagers.Add(new ProcessManager(settings.PhpDir + "\\active\\php-cgi.exe", "-b " + FastCgiAddress.Trim(), "PHP FastCGI (" + FastCgiAddress.Substring(FastCgiAddress.IndexOf(':') + 1) + ")", "PHP FastCGI"));
 					}
 				}
 

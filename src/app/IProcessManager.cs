@@ -6,6 +6,7 @@ namespace PhpVersionSwitcher
 	{
 		string Name { get; }
 		bool IsRunning();
+		string GroupName { get;  }
 		Task Start();
 		Task Stop();
 		Task Restart();
