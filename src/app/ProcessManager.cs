@@ -1,9 +1,6 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Management;
-using System;
 
 namespace PhpVersionSwitcher
 {
@@ -14,6 +11,7 @@ namespace PhpVersionSwitcher
 		public string FileName { get; private set; }
 		public string Arguments { get; private set; }
 		public string GroupName { get; private set; }
+		public Process Process { get; set; }
 
 		public ProcessManager(string path, string arguments = "", string name = null, string groupName = null)
 		{
@@ -27,7 +25,12 @@ namespace PhpVersionSwitcher
 
 		public bool IsRunning()
 		{
-			return this.GetProcess() != null;
+			if (Process == null)
+			{
+				return false;
+			}
+			Process.Refresh();
+			return !Process.HasExited;
 		}
 
 		public Task Start()
@@ -36,7 +39,7 @@ namespace PhpVersionSwitcher
 			{
 				try
 				{
-					var process = Process.Start(new ProcessStartInfo
+					Process = Process.Start(new ProcessStartInfo
 					{
 						WorkingDirectory = this.WorkingDirectory,
 						FileName = this.FileName,
@@ -45,7 +48,7 @@ namespace PhpVersionSwitcher
 						WindowStyle = ProcessWindowStyle.Hidden,
 					});
 
-					if (process != null && process.WaitForExit(1000))
+					if (Process != null && Process.WaitForExit(1000))
 					{
 						throw new ProcessException(this.Name, "start");
 					}
@@ -61,16 +64,15 @@ namespace PhpVersionSwitcher
 		{
 			return Task.Run(() =>
 			{
-				var process = this.GetProcess();
-				if (process == null)
+				if (Process == null)
 				{
 					return;
 				}
 
 				try
 				{
-					process.Kill();
-					if (!process.WaitForExit(7000))
+					Process.Kill();
+					if (!Process.WaitForExit(7000))
 					{
 						throw new ProcessException(this.FileName, "stop");
 					}
@@ -86,24 +88,6 @@ namespace PhpVersionSwitcher
 		{
 			await this.Stop();
 			await this.Start();
-		}
-
-		private Process GetProcess()
-		{
-			string wmiQuery = string.Format("select CommandLine, ProcessId from Win32_Process where Name='{0}'", this.FileName);
-			ManagementObjectCollection managementObjects = (new ManagementObjectSearcher(wmiQuery)).Get();
-
-			foreach (ManagementObject managementObject in managementObjects)
-			{
-				string line = (string) (managementObject["CommandLine"]);
-				if (line != null && line.Contains(this.Arguments))
-				{
-					var pId = Convert.ToInt32(managementObject["ProcessId"]);
-					return Process.GetProcessById(pId);
-				}
-			}
-
-			return null;
 		}
 
 	}
