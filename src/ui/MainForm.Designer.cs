@@ -36,7 +36,7 @@
 			// notifyIcon
 			// 
 			this.notifyIcon.ContextMenuStrip = this.notifyIconMenu;
-			this.notifyIcon.Icon = global::PhpVersionSwitcher.Properties.Resources.Globe;
+			this.notifyIcon.Icon = global::PhpVersionSwitcher.Properties.Resources.Icon_stopped;
 			this.notifyIcon.Text = "PHP Version Switcher";
 			this.notifyIcon.Visible = true;
 			this.notifyIcon.MouseUp += new System.Windows.Forms.MouseEventHandler(this.notifyIcon_MouseUp);
