@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using PhpVersionSwitcher.Properties;
 
 namespace PhpVersionSwitcher
 {
@@ -42,18 +43,25 @@ namespace PhpVersionSwitcher
 
 			this.notifyIconMenu.Items.Add(new ToolStripSeparator());
 
+			var running = false;
 			foreach (var pm in this.processManagers)
 			{
 				var menu = new ProcessMenu(pm);
 				menu.StartItem.Click += (sender, args) => this.Attempt(pm.Name + " to start", pm.Start);
 				menu.StopItem.Click += (sender, args) => this.Attempt(pm.Name + " to stop", pm.Stop);
 				menu.RestartItem.Click += (sender, args) => this.Attempt(pm.Name + " to restart", pm.Restart);
+				if (pm.IsRunning())
+				{
+					running = true;
+				}
+
 				this.notifyIconMenu.Items.Add(menu);
 			}
 
 			this.notifyIconMenu.Items.Add(new ToolStripSeparator());
 			this.notifyIconMenu.Items.Add("Refresh", null, (sender, args) => this.InitializeMainMenu());
 			this.notifyIconMenu.Items.Add("Close", null, (sender, args) => Application.Exit());
+			this.notifyIcon.Icon = running ? Resources.Icon_started :  Resources.Icon_stopped;
 		}
 
 		private async void Attempt(string description, Func<Task> action)
