@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using System.Management;
+using System;
 
 namespace PhpVersionSwitcher
 {
@@ -71,7 +73,7 @@ namespace PhpVersionSwitcher
 
 				try
 				{
-					Process.Kill();
+					ProcessManager.KillProcessAndChildren(Process.Id);
 					if (!Process.WaitForExit(7000))
 					{
 						throw new ProcessException(this.FileName, "stop");
@@ -88,6 +90,26 @@ namespace PhpVersionSwitcher
 		{
 			await this.Stop();
 			await this.Start();
+		}
+
+
+		private static void KillProcessAndChildren(int pid)
+		{
+			try
+			{
+				Process proc = Process.GetProcessById(pid);
+				proc.Kill();
+			}
+			catch (ArgumentException)
+			{
+			}
+
+			ManagementObjectSearcher searcher = new ManagementObjectSearcher ("Select * From Win32_Process Where ParentProcessID=" + pid);
+			ManagementObjectCollection moc = searcher.Get();
+			foreach (ManagementObject mo in moc)
+			{
+				KillProcessAndChildren(Convert.ToInt32(mo["ProcessID"]));
+			}
 		}
 
 	}

@@ -79,9 +79,16 @@ namespace PhpVersionSwitcher
 			}
 		}
 
+
 		private static void injectRunningProcesses(List<ProcessManager> processManagers, string fileName)
 		{
-			string wmiQuery = string.Format("select CommandLine, ProcessId from Win32_Process where Name='{0}'", fileName);
+			var list = new Dictionary<ProcessManager,List<Tuple<int,int>>>();
+			foreach (var processManager in processManagers)
+			{
+				list.Add(processManager, new List<Tuple<int,int>>());
+			}
+
+			string wmiQuery = string.Format("select CommandLine, ProcessId, ParentProcessID from Win32_Process where Name='{0}'", fileName);
 			ManagementObjectCollection managementObjects = (new ManagementObjectSearcher(wmiQuery)).Get();
 			foreach (ManagementObject managementObject in managementObjects)
 			{
@@ -91,9 +98,43 @@ namespace PhpVersionSwitcher
 					if (line != null && line.Contains(processManager.Arguments))
 					{
 						var pId = Convert.ToInt32(managementObject["ProcessId"]);
-						processManager.Process = Process.GetProcessById(pId);
+						var parentPId = Convert.ToInt32(managementObject["ParentProcessId"]);
+						list[processManager].Add(new Tuple<int, int>(pId, parentPId));
 					}
 				}
+			}
+
+			foreach (var processManager in processManagers)
+			{
+				int pId = -1;
+				var pairs = list[processManager];
+
+				if (pairs.Count == 1)
+				{
+					pId = pairs.ToArray()[0].Item1;
+				}
+				else if (pairs.Count > 1)
+				{
+					var parentIds = new List<int>();
+					foreach (var pair in pairs)
+					{
+						parentIds.Add(pair.Item1);
+					}
+					foreach (var pair in pairs)
+					{
+						if (!parentIds.Contains(pair.Item2))
+						{
+							pId = pair.Item1;
+						}
+					}
+				}
+
+				if (pId == -1)
+				{
+					continue;
+				}
+
+				processManager.Process = Process.GetProcessById(pId);
 			}
 		}
 
