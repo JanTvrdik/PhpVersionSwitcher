@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using System.Management;
+using System;
 
 namespace PhpVersionSwitcher
 {
@@ -10,19 +12,27 @@ namespace PhpVersionSwitcher
 		public string WorkingDirectory { get; private set; }
 		public string FileName { get; private set; }
 		public string Arguments { get; private set; }
+		public string GroupName { get; private set; }
+		public Process Process { get; set; }
 
-		public ProcessManager(string path, string arguments = "", string name = null)
+		public ProcessManager(string path, string arguments = "", string name = null, string groupName = null)
 		{
 			var info = new FileInfo(path);
 			this.WorkingDirectory = info.DirectoryName;
 			this.FileName = info.Name;
 			this.Arguments = arguments;
 			this.Name = name ?? info.Name;
+			this.GroupName = groupName;
 		}
 
 		public bool IsRunning()
 		{
-			return this.GetProcesses().Length > 0;
+			if (Process == null)
+			{
+				return false;
+			}
+			Process.Refresh();
+			return !Process.HasExited;
 		}
 
 		public Task Start()
@@ -31,7 +41,7 @@ namespace PhpVersionSwitcher
 			{
 				try
 				{
-					var process = Process.Start(new ProcessStartInfo
+					Process = Process.Start(new ProcessStartInfo
 					{
 						WorkingDirectory = this.WorkingDirectory,
 						FileName = this.FileName,
@@ -40,7 +50,7 @@ namespace PhpVersionSwitcher
 						WindowStyle = ProcessWindowStyle.Hidden,
 					});
 
-					if (process != null && process.WaitForExit(1000))
+					if (Process != null && Process.WaitForExit(1000))
 					{
 						throw new ProcessException(this.Name, "start");
 					}
@@ -56,21 +66,17 @@ namespace PhpVersionSwitcher
 		{
 			return Task.Run(() =>
 			{
-				var processes = this.GetProcesses();
+				if (Process == null)
+				{
+					return;
+				}
 
 				try
 				{
-					foreach (var process in processes)
+					ProcessManager.KillProcessAndChildren(Process.Id);
+					if (!Process.WaitForExit(7000))
 					{
-						process.Kill();
-					}
-
-					foreach (var process in processes)
-					{
-						if (!process.WaitForExit(7000))
-						{
-							throw new ProcessException(this.FileName, "stop");
-						}
+						throw new ProcessException(this.FileName, "stop");
 					}
 				}
 				catch
@@ -86,9 +92,25 @@ namespace PhpVersionSwitcher
 			await this.Start();
 		}
 
-		private Process[] GetProcesses()
+
+		private static void KillProcessAndChildren(int pid)
 		{
-			return Process.GetProcessesByName(this.FileName.Replace(".exe", ""));
+			try
+			{
+				Process proc = Process.GetProcessById(pid);
+				proc.Kill();
+			}
+			catch (ArgumentException)
+			{
+			}
+
+			ManagementObjectSearcher searcher = new ManagementObjectSearcher ("Select * From Win32_Process Where ParentProcessID=" + pid);
+			ManagementObjectCollection moc = searcher.Get();
+			foreach (ManagementObject mo in moc)
+			{
+				KillProcessAndChildren(Convert.ToInt32(mo["ProcessID"]));
+			}
 		}
+
 	}
 }

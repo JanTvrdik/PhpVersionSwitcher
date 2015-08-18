@@ -42,6 +42,7 @@ namespace PhpVersionSwitcher
 			}
 
 			this.notifyIconMenu.Items.Add(new ToolStripSeparator());
+			var menuGroups = new Dictionary<string, List<ProcessMenu> >();
 
 			var running = false;
 			foreach (var pm in this.processManagers)
@@ -55,6 +56,36 @@ namespace PhpVersionSwitcher
 					running = true;
 				}
 
+				if (pm.GroupName != null)
+				{
+					if (!menuGroups.ContainsKey(pm.GroupName)) menuGroups.Add(pm.GroupName, new List<ProcessMenu>());
+					menuGroups[pm.GroupName].Add(menu);
+				}
+				else
+				{
+					this.notifyIconMenu.Items.Add(menu);
+				}
+			}
+
+			foreach (var pair in menuGroups)
+			{
+				var menu = new ProcessMenuGroup(pair.Key, pair.Value);
+				var startTasks   = new Func<Task>[pair.Value.Count];
+				var stopTasks    = new Func<Task>[pair.Value.Count];
+				var restartTasks = new Func<Task>[pair.Value.Count];
+
+				var i = 0;
+				foreach (var processMenu in pair.Value)
+				{
+					startTasks[i]   = processMenu.ProcessManager.Start;
+					stopTasks[i]    = processMenu.ProcessManager.Stop;
+					restartTasks[i] = processMenu.ProcessManager.Restart;
+					i += 1;
+				}
+
+				menu.StartItem.Click += (sender, args) => this.Attempt(pair.Key, this.createMultiTask(startTasks));
+				menu.StopItem.Click += (sender, args) => this.Attempt(pair.Key, this.createMultiTask(stopTasks));
+				menu.RestartItem.Click += (sender, args) => this.Attempt(pair.Key, this.createMultiTask(restartTasks));
 				this.notifyIconMenu.Items.Add(menu);
 			}
 
@@ -88,6 +119,21 @@ namespace PhpVersionSwitcher
 			this.InitializeMainMenu();
 			this.waitingForm.Hide();
 			this.notifyIconMenu.Enabled = true;
+		}
+
+		private Func<Task> createMultiTask(Func<Task>[] taskRunners)
+		{
+			return () =>
+			{
+				var i = 0;
+				var tasks = new Task[taskRunners.Length];
+				foreach (var taskRunner in taskRunners)
+				{
+					tasks[i] = taskRunner();
+					i += 1;
+				}
+				return Task.WhenAll(tasks);
+			};
 		}
 
 		private void notifyIcon_MouseUp(object sender, MouseEventArgs e)

@@ -9,10 +9,12 @@ namespace PhpVersionSwitcher
 		public const int WaitTime = 7;
 
 		private ServiceController service;
+		public string GroupName { get; private set; }
 
-		public ServiceManager(string serviceName)
+		public ServiceManager(string serviceName, string groupName = null)
 		{
 			this.service = new ServiceController(serviceName);
+			this.GroupName = groupName;
 		}
 
 		public string Name
