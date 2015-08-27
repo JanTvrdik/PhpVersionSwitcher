@@ -4,6 +4,9 @@ using System.Diagnostics;
 using System.Management;
 using System.Windows.Forms;
 using PhpVersionSwitcher.Properties;
+using System.IO;
+using Newtonsoft.Json.Linq;
+using System.Linq;
 
 namespace PhpVersionSwitcher
 {
@@ -20,55 +23,59 @@ namespace PhpVersionSwitcher
 				Application.EnableVisualStyles();
 				Application.SetCompatibleTextRenderingDefault(false);
 
-				var settings = Settings.Default;
 				var processManagers = new List<IProcessManager>();
 
-				if (settings.HttpServerServiceName.Trim().Length > 0)
-				{
-					processManagers.Add(new ServiceManager(settings.HttpServerServiceName));
-				}
+				string settingsFile = System.Reflection.Assembly.GetEntryAssembly().Location;
+				settingsFile = settingsFile.Substring(0, settingsFile.Length - 3) + "json";
+				JObject settings = JObject.Parse(File.ReadAllText(settingsFile));
 
-				if (settings.HttpServerProcessPath.Trim().Length > 0)
+				settings["managers"].ToList().ForEach(manager =>
 				{
-					var processes = new List<ProcessManager>()
-					{
-						new ProcessManager(settings.HttpServerProcessPath)
-					};
-					injectRunningProcesses(processes, processes[0].FileName);
-					processManagers.AddRange(processes);
-				}
+					IDictionary<string, JToken> managerSetting = (IDictionary<string, JToken>)manager;
+					var type = (string)managerSetting["type"];
 
-				if (settings.FastCgiAddress.Trim().Length > 0)
-				{
-					var processes = new List<ProcessManager>()
+					if (type == "service")
 					{
-						new ProcessManager(settings.PhpDir + "\\active\\php-cgi.exe", "-b " + settings.FastCgiAddress.Trim(), "PHP FastCGI")
-					};
-					injectRunningProcesses(processes, processes[0].FileName);
-					processManagers.AddRange(processes);
-				}
-				else if (settings.FastCgiAddresses.Count > 0)
-				{
-					var processes = new List<ProcessManager>();
-					foreach (var FastCgiAddress in settings.FastCgiAddresses)
-					{
-						processes.Add(new ProcessManager(settings.PhpDir + "\\active\\php-cgi.exe", "-b " + FastCgiAddress.Trim(), "PHP FastCGI (" + FastCgiAddress.Substring(FastCgiAddress.IndexOf(':') + 1) + ")", "PHP FastCGI"));
+						processManagers.Add(new ServiceManager(
+							(string)managerSetting["name"],
+							((string)managerSetting["label"]) ?? null
+						));
 					}
-					injectRunningProcesses(processes, processes[0].FileName);
-					processManagers.AddRange(processes);
-				}
-
-				if (settings.PhpServerDocumentRoot.Length + settings.PhpServerAddress.Length > 0)
-				{
-					var processes = new List<ProcessManager>()
+					else if (type == "executable")
 					{
-						new ProcessManager(settings.PhpDir + "\\active\\php.exe", "-S " + settings.PhpServerAddress + " -t " + settings.PhpServerDocumentRoot, "PHP built-in server")
-					};
-					injectRunningProcesses(processes, processes[0].FileName);
-					processManagers.AddRange(processes);
-				}
+						List<ProcessManager> processes;
+						if (!managerSetting.ContainsKey("multiple"))
+						{
+							processes = new List<ProcessManager>() { new ProcessManager(
+								(string)managerSetting["path"],
+								((string)managerSetting["args"]) ?? "",
+								((string)managerSetting["label"]) ?? null
+							) };
+						}
+						else
+						{
+							processes = new List<ProcessManager>();
+							managerSetting["multiple"].ToList().ForEach(managerInstanceSettings =>
+							{
+								processes.Add(new ProcessManager(
+									(string)managerSetting["path"],
+									(string)managerInstanceSettings["args"],
+									((string)managerInstanceSettings["label"]) ?? null,
+									(string)managerSetting["label"])
+								);
+							});
+						}
 
-				var phpVersions = new VersionsManager(settings.PhpDir, processManagers);
+						processes.ForEach(process => processManagers.Add(process));
+						injectRunningProcesses(processes, processes[0].FileName);
+					}
+					else
+					{
+						throw new InvalidDataException();
+					}
+				});
+
+				var phpVersions = new VersionsManager((string)settings["phpDir"], processManagers);
 				var waitingForm = new WaitingForm();
 				new MainForm(processManagers, phpVersions, waitingForm);
 				Application.Run();

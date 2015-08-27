@@ -10,16 +10,13 @@ namespace PhpVersionSwitcher
 
 		private ServiceController service;
 		public string GroupName { get; private set; }
+		public string Name { get; private set; }
 
-		public ServiceManager(string serviceName, string groupName = null)
+		public ServiceManager(string serviceName, string label = null, string groupName = null)
 		{
 			this.service = new ServiceController(serviceName);
 			this.GroupName = groupName;
-		}
-
-		public string Name
-		{
-			get { return this.service.ServiceName; }
+			this.Name = label ?? serviceName;
 		}
 
 		public bool IsRunning()

@@ -1,0 +1,43 @@
+﻿{
+	"phpDir": "c:\\web\\php",
+	"managers": [
+		{
+			"type": "service",
+			"name": "Apache2.4",
+			"label": "Apache 2.4"
+		},
+		{
+			"type": "executable",
+			"path": "c:\\web\\nginx\\nginx-1.7.0\\nginx.exe",
+			"label": "NGINX 1.7"
+		},
+		{
+			"type": "executable",
+			"path": "c:\\web\\php\\actove\\php-cgi.exe",
+			"label": "PHP FastCGI",
+			"multiple": [
+				{"args": "-b 127.0.0.1:9300", "label": "PHP FastCGI (9300)"},
+				{"args": "-b 127.0.0.1:9301", "label": "PHP FastCGI (9301)"},
+				{"args": "-b 127.0.0.1:9302", "label": "PHP FastCGI (9302)"},
+				{"args": "-b 127.0.0.1:9303", "label": "PHP FastCGI (9303)"},
+				{"args": "-b 127.0.0.1:9304", "label": "PHP FastCGI (9304)"},
+				{"args": "-b 127.0.0.1:9305", "label": "PHP FastCGI (9305)"},
+				{"args": "-b 127.0.0.1:9306", "label": "PHP FastCGI (9306)"},
+				{"args": "-b 127.0.0.1:9307", "label": "PHP FastCGI (9307)"},
+				{"args": "-b 127.0.0.1:9308", "label": "PHP FastCGI (9308)"},
+				{"args": "-b 127.0.0.1:9309", "label": "PHP FastCGI (9309)"}
+			]
+		},
+		{
+			"type": "executable",
+			"path": "c:\\web\\php\\active\\php.exe",
+			"args": "-S 127.0.0.1:8080 -t c:\\web\\document_root",
+			"label": "PHP server"
+		},
+		{
+			"type": "service",
+			"name": "MySQL",
+			"label": "MySQL 5.6"
+		}
+	]
+}
