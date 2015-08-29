@@ -63,13 +63,18 @@ namespace PhpVersionSwitcher
 		{
 			return Task.Run(() =>
 			{
+				var timeSpan = TimeSpan.FromSeconds(WaitTime);
+
 				try
 				{
 					method();
-					this.service.WaitForStatus(status, TimeSpan.FromSeconds(WaitTime));
+					this.service.WaitForStatus(status, timeSpan);
 				}
 				catch (System.ServiceProcess.TimeoutException) { }
-				catch (InvalidOperationException) { }
+				catch (InvalidOperationException)
+				{
+					Task.Delay(timeSpan).Wait(); // force-wait
+				}
 
 				return this.CheckStatus(status);
 			});
