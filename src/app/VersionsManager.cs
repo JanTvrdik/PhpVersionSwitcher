@@ -9,6 +9,8 @@ namespace PhpVersionSwitcher
 {
 	internal class VersionsManager
 	{
+		private const string SystemEnvironmentVariableName = "PHP_VERSION_MAJOR";
+
 		private string phpBaseDir;
 
 		private IList<IProcessManager> serverManagers;
@@ -83,6 +85,11 @@ namespace PhpVersionSwitcher
 			await this.UpdateSymlink(version);
 			await this.UpdatePhpIni(version);
 
+			if (this.serverManagers.OfType<ServiceManager>().Any())
+			{
+				this.SetSystemEnvironmentVariable(version);
+			}
+
 			await Task.WhenAll(this.serverManagers
 				.Where((server, i) => this.running[i])
 				.Select(server => server.Start())
@@ -154,6 +161,12 @@ namespace PhpVersionSwitcher
 
 				Symlinks.CreateDir(symlink, target);
 			});
+		}
+
+		private void SetSystemEnvironmentVariable(Version version)
+		{
+			var phpVersionMajor = version.Major;
+			Environment.SetEnvironmentVariable(SystemEnvironmentVariableName, phpVersionMajor.ToString(), EnvironmentVariableTarget.Machine);
 		}
 	}
 }
