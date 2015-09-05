@@ -73,7 +73,7 @@ namespace PhpVersionSwitcher
 
 				try
 				{
-					ProcessManager.KillProcessAndChildren(Process.Id);
+					this.KillProcessAndChildren(Process.Id);
 					if (!Process.WaitForExit(7000))
 					{
 						throw new ProcessException(this.FileName, "stop");
@@ -93,7 +93,7 @@ namespace PhpVersionSwitcher
 		}
 
 
-		private static void KillProcessAndChildren(int pid)
+		private void KillProcessAndChildren(int pid)
 		{
 			try
 			{
@@ -104,11 +104,11 @@ namespace PhpVersionSwitcher
 			{
 			}
 
-			ManagementObjectSearcher searcher = new ManagementObjectSearcher ("Select * From Win32_Process Where ParentProcessID=" + pid);
-			ManagementObjectCollection moc = searcher.Get();
-			foreach (ManagementObject mo in moc)
+			var searcher = new ManagementObjectSearcher("Select * From Win32_Process Where ParentProcessID=" + pid);
+			var moc = searcher.Get();
+			foreach (var mo in moc)
 			{
-				KillProcessAndChildren(Convert.ToInt32(mo["ProcessID"]));
+				this.KillProcessAndChildren(Convert.ToInt32(mo["ProcessID"]));
 			}
 		}
 
