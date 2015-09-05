@@ -49,6 +49,11 @@
 	AddHandler application/x-httpd-php .php
 	```
 
+3. You can use `PHP_VERSION_MAJOR` variable in Apache configuration file. This is useful when you switch between PHP 5 and new PHP 7 version:
+	```
+	LoadModule php${PHP_VERSION_MAJOR}_module "C:/Web/Soft/PHP/active/php${PHP_VERSION_MAJOR}apache2_4.dll"
+	```
+
 ### Nginx + PHP FastCGI
 
 1. Update `HttpServerProcessPath` option in `PhpVersionSwitcher.exe.config` to contain path to `nginx.exe`.
