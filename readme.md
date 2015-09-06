@@ -120,6 +120,7 @@
 ### PHP built-in server
 
 1. Add definition under `executables` key:
+
 	~~~
 	{
 		"executables": [

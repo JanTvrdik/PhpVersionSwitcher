@@ -1,5 +1,5 @@
 ﻿{
-	"phpDir": "c:\\web\\php",
+	"phpDir": "C:\\web\\php",
 	"services": [
 		{
 			"label": "Apache 2.4",
@@ -11,30 +11,30 @@
 		}
 	],
 	"executables": [
-		{
-			"label": "NGINX 1.7",
-			"path": "c:\\web\\nginx\\nginx-1.7.0\\nginx.exe"
-		},
-		{
-			"label": "PHP FastCGI",
-			"path": "c:\\web\\php\\active\\php-cgi.exe",
-			"multiple": [
-				{"args": "-b 127.0.0.1:9300", "label": "PHP FastCGI (9300)"},
-				{"args": "-b 127.0.0.1:9301", "label": "PHP FastCGI (9301)"},
-				{"args": "-b 127.0.0.1:9302", "label": "PHP FastCGI (9302)"},
-				{"args": "-b 127.0.0.1:9303", "label": "PHP FastCGI (9303)"},
-				{"args": "-b 127.0.0.1:9304", "label": "PHP FastCGI (9304)"},
-				{"args": "-b 127.0.0.1:9305", "label": "PHP FastCGI (9305)"},
-				{"args": "-b 127.0.0.1:9306", "label": "PHP FastCGI (9306)"},
-				{"args": "-b 127.0.0.1:9307", "label": "PHP FastCGI (9307)"},
-				{"args": "-b 127.0.0.1:9308", "label": "PHP FastCGI (9308)"},
-				{"args": "-b 127.0.0.1:9309", "label": "PHP FastCGI (9309)"}
-			]
-		},
-		{
-			"label": "PHP built-in server",
-			"path": "c:\\web\\php\\active\\php.exe",
-			"args": "-S 127.0.0.1:9990 -t c:\\projects"
-		},
+		// {
+		// 	"label": "Nginx 1.9",
+		// 	"path": "C:\\web\\nginx\\nginx.exe"
+		// },
+		// {
+		// 	"label": "PHP FastCGI",
+		// 	"path": "C:\\web\\php\\active\\php-cgi.exe",
+		// 	"multiple": [
+		// 		{"args": "-b 127.0.0.1:9300", "label": "PHP FastCGI (9300)"},
+		// 		{"args": "-b 127.0.0.1:9301", "label": "PHP FastCGI (9301)"},
+		// 		{"args": "-b 127.0.0.1:9302", "label": "PHP FastCGI (9302)"},
+		// 		{"args": "-b 127.0.0.1:9303", "label": "PHP FastCGI (9303)"},
+		// 		{"args": "-b 127.0.0.1:9304", "label": "PHP FastCGI (9304)"},
+		// 		{"args": "-b 127.0.0.1:9305", "label": "PHP FastCGI (9305)"},
+		// 		{"args": "-b 127.0.0.1:9306", "label": "PHP FastCGI (9306)"},
+		// 		{"args": "-b 127.0.0.1:9307", "label": "PHP FastCGI (9307)"},
+		// 		{"args": "-b 127.0.0.1:9308", "label": "PHP FastCGI (9308)"},
+		// 		{"args": "-b 127.0.0.1:9309", "label": "PHP FastCGI (9309)"}
+		// 	]
+		// },
+		// {
+		// 	"label": "PHP built-in server",
+		// 	"path": "C:\\web\\php\\active\\php.exe",
+		// 	"args": "-S 127.0.0.1:9990 -t C:\\projects"
+		// }
 	]
 }
