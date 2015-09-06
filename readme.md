@@ -159,7 +159,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  THE SOFTWARE.
 
 
- ## Icons
- Application icon made by [Picol](http://picol.org), state icons by [Freepik](http://www.freepik.com)
+### Icons
+
+Application icon made by [Picol](http://picol.org), state icons by [Freepik](http://www.freepik.com)
  from [www.flaticon.com](http://www.flaticon.com), all are modified by Jan Skrasek and licensed
  under [CC BY 3.0](http://creativecommons.org/licenses/by/3.0/).
