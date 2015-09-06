@@ -159,10 +159,11 @@ namespace PhpVersionSwitcher
 
 		private Task UpdateEnvironmentVariable(Version version)
 		{
-			var phpVersionMajor = version.Major.ToString();
-			Environment.SetEnvironmentVariable("PHP_VERSION_MAJOR", phpVersionMajor, EnvironmentVariableTarget.Machine);
-
-			return Task.CompletedTask;
+			return Task.Run(() =>
+			{
+				var phpVersionMajor = version.Major.ToString();
+				Environment.SetEnvironmentVariable("PHP_VERSION_MAJOR", phpVersionMajor, EnvironmentVariableTarget.Machine);
+			});
 		}
 	}
 }
