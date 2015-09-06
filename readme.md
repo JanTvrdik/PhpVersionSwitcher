@@ -1,6 +1,6 @@
 # PhpVersionSwitcher
 
-![PhpVersionSwitcher screenshot](http://skladka.merxes.cz/img/phpversionswitcher.png?v=2)
+![PhpVersionSwitcher screenshot](docs/assets/screenshot.png)
 
 
 ## Installation
