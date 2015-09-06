@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("PhpVersionSwitcher")]
-[assembly: AssemblyCopyright("Copyright © 2014 Jan Tvrdík")]
+[assembly: AssemblyCopyright("Copyright © 2015 Jan Tvrdík")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -29,4 +29,4 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("1.2.0.*")]
+[assembly: AssemblyVersion("1.5.0.*")]
