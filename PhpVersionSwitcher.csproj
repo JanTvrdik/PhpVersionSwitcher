@@ -88,6 +88,8 @@
     </Compile>
     <Compile Include="src\app\IProcessManager.cs" />
     <Compile Include="src\app\ProcessManager.cs" />
+    <Compile Include="src\config\Config.cs" />
+    <Compile Include="src\config\ConfigLoader.cs" />
     <Compile Include="src\exceptions\ProcessException.cs" />
     <Compile Include="src\ui\ProcessMenu.cs">
       <SubType>Component</SubType>

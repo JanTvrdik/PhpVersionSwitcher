@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Management;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using PhpVersionSwitcher.Properties;
 using System.IO;
-using Newtonsoft.Json.Linq;
 using System.Linq;
 
 namespace PhpVersionSwitcher
@@ -25,57 +25,37 @@ namespace PhpVersionSwitcher
 
 				var processManagers = new List<IProcessManager>();
 
-				string settingsFile = System.Reflection.Assembly.GetEntryAssembly().Location;
-				settingsFile = settingsFile.Substring(0, settingsFile.Length - 3) + "json";
-				JObject settings = JObject.Parse(File.ReadAllText(settingsFile));
+				var exePath = System.Reflection.Assembly.GetEntryAssembly().Location;
+				var configPath = exePath.Substring(0, exePath.Length - 3) + "json";
+				var config = new ConfigLoader().Load(configPath);
 
-				settings["managers"].ToList().ForEach(manager =>
+				config.Services?.ForEach(service =>
 				{
-					IDictionary<string, JToken> managerSetting = (IDictionary<string, JToken>)manager;
-					var type = (string)managerSetting["type"];
+					processManagers.Add(new ServiceManager(service.Name, service.Label));
+				});
 
-					if (type == "service")
-					{
-						processManagers.Add(new ServiceManager(
-							(string)managerSetting["name"],
-							((string)managerSetting["label"]) ?? null
-						));
-					}
-					else if (type == "executable")
-					{
-						List<ProcessManager> processes;
-						if (!managerSetting.ContainsKey("multiple"))
-						{
-							processes = new List<ProcessManager>() { new ProcessManager(
-								(string)managerSetting["path"],
-								((string)managerSetting["args"]) ?? "",
-								((string)managerSetting["label"]) ?? null
-							) };
-						}
-						else
-						{
-							processes = new List<ProcessManager>();
-							managerSetting["multiple"].ToList().ForEach(managerInstanceSettings =>
-							{
-								processes.Add(new ProcessManager(
-									(string)managerSetting["path"],
-									(string)managerInstanceSettings["args"],
-									((string)managerInstanceSettings["label"]) ?? null,
-									(string)managerSetting["label"])
-								);
-							});
-						}
+				config.Executables?.ForEach(exe =>
+				{
+					List<ProcessManager> processes;
 
-						processes.ForEach(process => processManagers.Add(process));
-						injectRunningProcesses(processes, processes[0].FileName);
+					if (exe.Multiple == null)
+					{
+						processes = new List<ProcessManager>() {
+							new ProcessManager(exe.Path, exe.Args, exe.Label)
+						};
 					}
 					else
 					{
-						throw new InvalidDataException();
+						processes = exe.Multiple
+							.Select(child => new ProcessManager(child.Path, child.Args, child.Label, exe.Label))
+							.ToList();
 					}
+
+					processes.ForEach(process => processManagers.Add(process));
+					injectRunningProcesses(processes, processes[0].FileName);
 				});
 
-				var phpVersions = new VersionsManager((string)settings["phpDir"], processManagers);
+				var phpVersions = new VersionsManager(config.PhpDir, processManagers);
 				var waitingForm = new WaitingForm();
 				new MainForm(processManagers, phpVersions, waitingForm);
 				Application.Run();
