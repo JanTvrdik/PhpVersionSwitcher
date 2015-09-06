@@ -8,7 +8,7 @@
 1. Download and extract a [release archive](https://github.com/JanTvrdik/PhpVersionSwitcher/releases) to directory of your choice
 
 2. Create a base directory for PHP with the following structure:
-	```
+	~~~
 	%phpDir%/
 	├── configurations/
 	│   ├── 5.x.x.ini        # php.ini options for all 5.x.x versions
@@ -25,56 +25,112 @@
 	    │   ├── ...
 	    │   └── php.exe
 	    └── ...
-	```
+	~~~
 
 3. Create php.ini files in the `configurations` directory. In all php.ini files you can use `%phpDir%` variable. This is especially useful for `zend_extension`, e.g.
-	```
+	~~~
 	zend_extension = "%phpDir%\ext\php_opcache.dll"
 	zend_extension = "%phpDir%\ext\php_xdebug.dll"
-	```
+	~~~
 
 4. The active PHP version is always symlinked to `%phpDir%\active`. You may want to add this directory to `PATH`.
 
-5. Update `PhpDir` option in `PhpVersionSwitcher.exe.config` to contain path to base PHP directory.
+5. Update `phpDir` option in `PhpVersionSwitcher.json` to contain path to the base PHP directory.
 
 
 ### Apache + PHP module
 
-1. Update `HttpServerServiceName` option in `PhpVersionSwitcher.exe.config` to contain name of Apache service.
+1. Add Apache service definition under `services` key:
+	~~~
+	{
+		"services": [
+			{
+				"label": "Apache 2.4",
+				"name": "Apache2.4"
+			}
+		]
+	}
+	~~~
 
 2. Update Apache configuration to contain something like this:
-	```
-	LoadModule php5_module "C:/Web/Soft/PHP/active/php5apache2_4.dll"
-	PHPIniDir "C:/Web/Soft/PHP/active"
+	~~~
+	LoadModule php5_module "C:/web/php/active/php5apache2_4.dll"
+	PHPIniDir "C:/web/php/active"
 	AddHandler application/x-httpd-php .php
-	```
+	~~~
 
-3. You can use `PHP_VERSION_MAJOR` variable in Apache configuration file. This is useful when you switch between PHP 5 and new PHP 7 version:
-	```
-	LoadModule php${PHP_VERSION_MAJOR}_module "C:/Web/Soft/PHP/active/php${PHP_VERSION_MAJOR}apache2_4.dll"
-	```
+3. You can use `PHP_VERSION_MAJOR` variable in Apache configuration file. This is useful when you switch between PHP 5 and PHP 7 versions:
+	~~~
+	LoadModule php${PHP_VERSION_MAJOR}_module "C:/web/php/active/php${PHP_VERSION_MAJOR}apache2_4.dll"
+	~~~
 
 ### Nginx + PHP FastCGI
 
-1. Update `HttpServerProcessPath` option in `PhpVersionSwitcher.exe.config` to contain path to `nginx.exe`.
+1. Add Nginx and PHP FastCGI definitions under `executables` key:
+	~~~
+	{
+		"executables": [
+			{
+				"label": "Nginx 1.9",
+				"path": "C:\\web\\nginx\\nginx.exe"
+			},
+			{
+				"label": "PHP FastCGI",
+				"path": "C:\\web\\php\\active\\php-cgi.exe",
+				"multiple": [
+					{"args": "-b 127.0.0.1:9300", "label": "PHP FastCGI (9300)"},
+					{"args": "-b 127.0.0.1:9301", "label": "PHP FastCGI (9301)"},
+					{"args": "-b 127.0.0.1:9302", "label": "PHP FastCGI (9302)"},
+					{"args": "-b 127.0.0.1:9303", "label": "PHP FastCGI (9303)"},
+					{"args": "-b 127.0.0.1:9304", "label": "PHP FastCGI (9304)"},
+					{"args": "-b 127.0.0.1:9305", "label": "PHP FastCGI (9305)"},
+					{"args": "-b 127.0.0.1:9306", "label": "PHP FastCGI (9306)"},
+					{"args": "-b 127.0.0.1:9307", "label": "PHP FastCGI (9307)"},
+					{"args": "-b 127.0.0.1:9308", "label": "PHP FastCGI (9308)"},
+					{"args": "-b 127.0.0.1:9309", "label": "PHP FastCGI (9309)"}
+				]
+			},
+		]
+	}
+	~~~
 
-2. Update `FastCgiAddress` option in `PhpVersionSwitcher.exe.config` to contain IP address + port which FastCGI should bind to.
+2. Update Nginx configuration to contain something like this:
+	~~~
+    upstream php_farm {
+        server 127.0.0.1:9300 weight=1;
+        server 127.0.0.1:9301 weight=1;
+        server 127.0.0.1:9302 weight=1;
+        server 127.0.0.1:9303 weight=1;
+        server 127.0.0.1:9304 weight=1;
+        server 127.0.0.1:9305 weight=1;
+        server 127.0.0.1:9306 weight=1;
+        server 127.0.0.1:9307 weight=1;
+        server 127.0.0.1:9308 weight=1;
+        server 127.0.0.1:9309 weight=1;
+    }
 
-3. Update Nginx configuration to contain something like this:
-	```
 	location ~ \.php$ {
-		fastcgi_pass   127.0.0.1:9090;
+		fastcgi_pass   php_farm;
 		fastcgi_index  index.php;
 		fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
 		include        fastcgi_params;
 	}
-	```
+	~~~
 
 ### PHP built-in server
 
-1. Update `PhpServerDocumentRoot` option in `PhpVersionSwitcher.exe.config` to contain path document root.
-
-2. Update `PhpServerAddress` option in `PhpVersionSwitcher.exe.config` to contain IP address + port which PHP built-in server should bind to.
+1. Add definition under `executables` key:
+	~~~
+	{
+		"executables": [
+			{
+				"label": "PHP built-in server",
+				"path": "C:\\web\\php\\active\\php.exe",
+				"args": "-S 127.0.0.1:9990 -t C:\\projects"
+			}
+		]
+	}
+	~~~
 
 
 ## License
