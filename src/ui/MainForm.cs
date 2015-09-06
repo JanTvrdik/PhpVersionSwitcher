@@ -29,7 +29,7 @@ namespace PhpVersionSwitcher
 			this.notifyIconMenu.Items.Clear();
 			this.notifyIconMenu.Items.AddRange(this.CreateVersionsItems());
 			this.notifyIconMenu.Items.Add(new ToolStripSeparator());
-			var menuGroups = new Dictionary<string, List<ProcessMenu> >();
+			var menuGroups = new Dictionary<string, List<ProcessMenu>>();
 
 			var running = false;
 			foreach (var pm in this.processManagers)
@@ -57,15 +57,15 @@ namespace PhpVersionSwitcher
 			foreach (var pair in menuGroups)
 			{
 				var menu = new ProcessMenuGroup(pair.Key, pair.Value);
-				var startTasks   = new Func<Task>[pair.Value.Count];
-				var stopTasks    = new Func<Task>[pair.Value.Count];
+				var startTasks = new Func<Task>[pair.Value.Count];
+				var stopTasks = new Func<Task>[pair.Value.Count];
 				var restartTasks = new Func<Task>[pair.Value.Count];
 
 				var i = 0;
 				foreach (var processMenu in pair.Value)
 				{
-					startTasks[i]   = processMenu.ProcessManager.Start;
-					stopTasks[i]    = processMenu.ProcessManager.Stop;
+					startTasks[i] = processMenu.ProcessManager.Start;
+					stopTasks[i] = processMenu.ProcessManager.Stop;
 					restartTasks[i] = processMenu.ProcessManager.Restart;
 					i += 1;
 				}
@@ -79,7 +79,7 @@ namespace PhpVersionSwitcher
 			this.notifyIconMenu.Items.Add(new ToolStripSeparator());
 			this.notifyIconMenu.Items.Add("Refresh", null, (sender, args) => this.InitializeMainMenu());
 			this.notifyIconMenu.Items.Add("Close", null, (sender, args) => Application.Exit());
-			this.notifyIcon.Icon = running ? Resources.Icon_started :  Resources.Icon_stopped;
+			this.notifyIcon.Icon = running ? Resources.Icon_started : Resources.Icon_stopped;
 		}
 
 		private ToolStripMenuItem[] CreateVersionsItems()
@@ -139,7 +139,7 @@ namespace PhpVersionSwitcher
 					if (dialogResult != DialogResult.Retry) break;
 				}
 			}
-			
+
 			this.InitializeMainMenu();
 			this.waitingForm.Hide();
 			this.notifyIconMenu.Enabled = true;

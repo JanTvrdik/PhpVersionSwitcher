@@ -69,17 +69,17 @@ namespace PhpVersionSwitcher
 
 		private static void injectRunningProcesses(List<ProcessManager> processManagers, string fileName)
 		{
-			var list = new Dictionary<ProcessManager,List<Tuple<int,int>>>();
+			var list = new Dictionary<ProcessManager, List<Tuple<int, int>>>();
 			foreach (var processManager in processManagers)
 			{
-				list.Add(processManager, new List<Tuple<int,int>>());
+				list.Add(processManager, new List<Tuple<int, int>>());
 			}
 
 			string wmiQuery = string.Format("select CommandLine, ProcessId, ParentProcessID from Win32_Process where Name='{0}'", fileName);
 			ManagementObjectCollection managementObjects = (new ManagementObjectSearcher(wmiQuery)).Get();
 			foreach (ManagementObject managementObject in managementObjects)
 			{
-				string line = (string)(managementObject["CommandLine"]);
+				string line = (string) (managementObject["CommandLine"]);
 				foreach (var processManager in processManagers)
 				{
 					if (line != null && line.Contains(processManager.Arguments))

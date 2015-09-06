@@ -107,7 +107,7 @@ namespace PhpVersionSwitcher
 		{
 			return Task.Run(() =>
 			{
-				var files = new string[]
+				var files = new[]
 				{
 					version.Major + ".x.x.ini",
 					version.Major + "." + version.Minor + ".x.ini",
