@@ -82,9 +82,11 @@ namespace PhpVersionSwitcher
 					.Select(server => server.Stop())
 				);
 
-				await this.UpdateSymlink(version);
-				await this.UpdatePhpIni(version);
-				await this.UpdateEnvironmentVariable(version);
+				await Task.WhenAll(
+					this.UpdateSymlink(version),
+					this.UpdatePhpIni(version),
+					this.UpdateEnvironmentVariable(version)
+				);
 
 				await Task.WhenAll(this.serverManagers
 					.Where((server, i) => this.running[i])
@@ -126,6 +128,7 @@ namespace PhpVersionSwitcher
 					version.Major + "." + version.Minor + "." + version.Patch + ".ini"
 				};
 
+				var dir = this.GetVersionDir(version);
 				var ini = new StringBuilder();
 				foreach (var file in files)
 				{
@@ -133,13 +136,13 @@ namespace PhpVersionSwitcher
 					if (File.Exists(path))
 					{
 						var content = File.ReadAllText(path);
-						content = content.Replace("%phpDir%", this.GetVersionDir(version));
+						content = content.Replace("%phpDir%", dir);
 						ini.AppendLine();
 						ini.AppendLine(content);
 					}
 				}
 
-				File.WriteAllText(this.ActivePhpDir + "\\php.ini", ini.ToString());
+				File.WriteAllText(dir + "\\php.ini", ini.ToString());
 			});
 		}
 
