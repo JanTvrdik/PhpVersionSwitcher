@@ -77,6 +77,7 @@ namespace PhpVersionSwitcher
 			}
 
 			await Task.WhenAll(this.serverManagers
+				.Where((server, i) => this.running[i])
 				.Select(server => server.Stop())
 			);
 
