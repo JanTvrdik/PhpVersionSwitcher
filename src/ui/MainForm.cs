@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -125,13 +126,7 @@ namespace PhpVersionSwitcher
 		{
 			return () =>
 			{
-				var i = 0;
-				var tasks = new Task[taskRunners.Length];
-				foreach (var taskRunner in taskRunners)
-				{
-					tasks[i] = taskRunner();
-					i += 1;
-				}
+				var tasks = taskRunners.Select(fn => fn());
 				return Task.WhenAll(tasks);
 			};
 		}

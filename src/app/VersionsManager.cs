@@ -70,10 +70,9 @@ namespace PhpVersionSwitcher
 
 			if (updateState)
 			{
-				for (var i = 0; i < this.serverManagers.Count; i++)
-				{
-					this.running[i] = this.serverManagers[i].IsRunning();
-				}
+				this.running = this.serverManagers
+					.Select(server => server.IsRunning())
+					.ToArray();
 			}
 
 			await Task.WhenAll(this.serverManagers
