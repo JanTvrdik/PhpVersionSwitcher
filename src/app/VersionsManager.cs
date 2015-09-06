@@ -153,8 +153,13 @@ namespace PhpVersionSwitcher
 		{
 			return Task.Run(() =>
 			{
-				var phpVersionMajor = version.Major.ToString();
-				Environment.SetEnvironmentVariable("PHP_VERSION_MAJOR", phpVersionMajor, EnvironmentVariableTarget.Machine);
+				var current = Environment.GetEnvironmentVariable("PHP_VERSION_MAJOR", EnvironmentVariableTarget.Machine);
+				var future = version.Major.ToString();
+
+				if (future != current)
+				{
+					Environment.SetEnvironmentVariable("PHP_VERSION_MAJOR", future, EnvironmentVariableTarget.Machine);
+				}
 			});
 		}
 	}
