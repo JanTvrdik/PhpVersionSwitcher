@@ -63,33 +63,36 @@ namespace PhpVersionSwitcher
 			}
 		}
 
-		public async Task SwitchTo(Version version)
+		public Task SwitchTo(Version version)
 		{
-			var updateState = this.switchToSuccess;
-			this.switchToSuccess = false;
-
-			if (updateState)
+			return Task.Run(async () =>
 			{
-				this.running = this.serverManagers
-					.Select(server => server.IsRunning())
-					.ToArray();
-			}
+				var updateState = this.switchToSuccess;
+				this.switchToSuccess = false;
 
-			await Task.WhenAll(this.serverManagers
-				.Where((server, i) => this.running[i])
-				.Select(server => server.Stop())
-			);
+				if (updateState)
+				{
+					this.running = this.serverManagers
+						.Select(server => server.IsRunning())
+						.ToArray();
+				}
 
-			await this.UpdateSymlink(version);
-			await this.UpdatePhpIni(version);
-			await this.UpdateEnvironmentVariable(version);
+				await Task.WhenAll(this.serverManagers
+					.Where((server, i) => this.running[i])
+					.Select(server => server.Stop())
+				);
 
-			await Task.WhenAll(this.serverManagers
-				.Where((server, i) => this.running[i])
-				.Select(server => server.Start())
-			);
+				await this.UpdateSymlink(version);
+				await this.UpdatePhpIni(version);
+				await this.UpdateEnvironmentVariable(version);
 
-			this.switchToSuccess = true;
+				await Task.WhenAll(this.serverManagers
+					.Where((server, i) => this.running[i])
+					.Select(server => server.Start())
+				);
+
+				this.switchToSuccess = true;
+			});
 		}
 
 		public string ActivePhpDir
