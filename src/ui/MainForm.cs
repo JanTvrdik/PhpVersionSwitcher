@@ -27,21 +27,7 @@ namespace PhpVersionSwitcher
 		private void InitializeMainMenu()
 		{
 			this.notifyIconMenu.Items.Clear();
-			var activeVersion = this.phpVersions.GetActive();
-			var versions = this.phpVersions.GetAvailable();
-
-			foreach (var version in versions)
-			{
-				var item = new ToolStripMenuItem(version.Label);
-				item.Checked = version.Equals(activeVersion);
-				item.Click += (sender, args) => this.Attempt("PHP version to change", async () =>
-				{
-					await this.phpVersions.SwitchTo(version);
-				});
-
-				this.notifyIconMenu.Items.Add(item);
-			}
-
+			this.notifyIconMenu.Items.AddRange(this.CreateVersionsItems());
 			this.notifyIconMenu.Items.Add(new ToolStripSeparator());
 			var menuGroups = new Dictionary<string, List<ProcessMenu> >();
 
@@ -94,6 +80,43 @@ namespace PhpVersionSwitcher
 			this.notifyIconMenu.Items.Add("Refresh", null, (sender, args) => this.InitializeMainMenu());
 			this.notifyIconMenu.Items.Add("Close", null, (sender, args) => Application.Exit());
 			this.notifyIcon.Icon = running ? Resources.Icon_started :  Resources.Icon_stopped;
+		}
+
+		private ToolStripMenuItem[] CreateVersionsItems()
+		{
+			var activeVersion = this.phpVersions.GetActive();
+			var versions = this.phpVersions.GetAvailable();
+
+			var groups = versions.GroupBy(version => version.Full);
+			var items = groups.Select(group =>
+			{
+				var children = group.Select(version => CreateVersionItem(version, activeVersion)).ToArray();
+
+				if (children.Length == 1)
+				{
+					return children.First();
+				}
+				else
+				{
+					var item = new ToolStripMenuItem(group.Key);
+					item.DropDownItems.AddRange(children);
+					return item;
+				}
+			});
+
+			return items.ToArray();
+		}
+
+		private ToolStripMenuItem CreateVersionItem(Version version, Version activeVersion)
+		{
+			var item = new ToolStripMenuItem(version.Label);
+			item.Checked = version.Equals(activeVersion);
+			item.Click += (sender, args) => this.Attempt("PHP version to change", async () =>
+			{
+				await this.phpVersions.SwitchTo(version);
+			});
+
+			return item;
 		}
 
 		private async void Attempt(string description, Func<Task> action)

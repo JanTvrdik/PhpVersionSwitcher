@@ -31,6 +31,8 @@ namespace PhpVersionSwitcher
 
 		public int Patch { get; private set; }
 
+		public string Full { get { return Major + "." + Minor + "." + Patch; } }
+
 		public VersionStability Stability { get; private set; }
 
 		public int StabilityVersion { get; private set; }
