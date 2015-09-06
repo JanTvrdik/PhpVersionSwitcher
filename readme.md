@@ -96,18 +96,18 @@
 
 2. Update Nginx configuration to contain something like this:
 	~~~
-    upstream php_farm {
-        server 127.0.0.1:9300 weight=1;
-        server 127.0.0.1:9301 weight=1;
-        server 127.0.0.1:9302 weight=1;
-        server 127.0.0.1:9303 weight=1;
-        server 127.0.0.1:9304 weight=1;
-        server 127.0.0.1:9305 weight=1;
-        server 127.0.0.1:9306 weight=1;
-        server 127.0.0.1:9307 weight=1;
-        server 127.0.0.1:9308 weight=1;
-        server 127.0.0.1:9309 weight=1;
-    }
+	upstream php_farm {
+		server 127.0.0.1:9300 weight=1;
+		server 127.0.0.1:9301 weight=1;
+		server 127.0.0.1:9302 weight=1;
+		server 127.0.0.1:9303 weight=1;
+		server 127.0.0.1:9304 weight=1;
+		server 127.0.0.1:9305 weight=1;
+		server 127.0.0.1:9306 weight=1;
+		server 127.0.0.1:9307 weight=1;
+		server 127.0.0.1:9308 weight=1;
+		server 127.0.0.1:9309 weight=1;
+	}
 
 	location ~ \.php$ {
 		fastcgi_pass   php_farm;
