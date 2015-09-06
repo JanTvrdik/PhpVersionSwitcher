@@ -11,17 +11,16 @@ namespace PhpVersionSwitcher
 	{
 		private string phpBaseDir;
 
-		private IList<IProcessManager> serverManagers;
+		private IEnumerable<IProcessManager> serverManagers;
 
-		private bool[] running;
+		private IEnumerable<IProcessManager> running;
 
 		private bool switchToSuccess;
 
-		public VersionsManager(string phpBaseDir, IList<IProcessManager> serverManagers)
+		public VersionsManager(string phpBaseDir, IEnumerable<IProcessManager> serverManagers)
 		{
 			this.phpBaseDir = phpBaseDir;
 			this.serverManagers = serverManagers;
-			this.running = new bool[serverManagers.Count];
 			this.switchToSuccess = true;
 		}
 
@@ -67,32 +66,19 @@ namespace PhpVersionSwitcher
 		{
 			return Task.Run(async () =>
 			{
-				var updateState = this.switchToSuccess;
-				this.switchToSuccess = false;
-
-				if (updateState)
+				if (this.switchToSuccess)
 				{
-					this.running = this.serverManagers
-						.Select(server => server.IsRunning())
-						.ToArray();
+					this.running = this.serverManagers.Where(server => server.IsRunning()).ToArray();
 				}
 
-				await Task.WhenAll(this.serverManagers
-					.Where((server, i) => this.running[i])
-					.Select(server => server.Stop())
-				);
-
+				this.switchToSuccess = false;
+				await Task.WhenAll(this.running.Select(server => server.Stop()));
 				await Task.WhenAll(
 					this.UpdateSymlink(version),
 					this.UpdatePhpIni(version),
 					this.UpdateEnvironmentVariable(version)
 				);
-
-				await Task.WhenAll(this.serverManagers
-					.Where((server, i) => this.running[i])
-					.Select(server => server.Start())
-				);
-
+				await Task.WhenAll(this.running.Select(server => server.Start()));
 				this.switchToSuccess = true;
 			});
 		}
