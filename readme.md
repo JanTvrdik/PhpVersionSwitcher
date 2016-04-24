@@ -52,14 +52,9 @@
 
 2. Update Apache configuration to contain something like this:
 	~~~apache
-	LoadModule php5_module "C:/web/php/active/php5apache2_4.dll"
+	LoadModule php${PHP_VERSION_MAJOR}_module "C:/web/php/active/php${PHP_VERSION_MAJOR}apache2_4.dll"
 	AddHandler application/x-httpd-php .php
 	PHPIniDir "C:/web/php/active"
-	~~~
-
-3. You can use `PHP_VERSION_MAJOR` variable in Apache configuration file. This is useful when you switch between PHP 5 and PHP 7 versions:
-	~~~apache
-	LoadModule php${PHP_VERSION_MAJOR}_module "C:/web/php/active/php${PHP_VERSION_MAJOR}apache2_4.dll"
 	~~~
 
 
