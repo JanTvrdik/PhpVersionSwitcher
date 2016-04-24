@@ -76,7 +76,7 @@ namespace PhpVersionSwitcher
 				await Task.WhenAll(
 					this.UpdateSymlink(version),
 					this.UpdatePhpIni(version),
-					this.UpdateEnvironmentVariable(version)
+					this.UpdateEnvironmentVariables(version)
 				);
 				await Task.WhenAll(this.running.Select(server => server.Start()));
 				this.switchToSuccess = true;
@@ -150,16 +150,29 @@ namespace PhpVersionSwitcher
 			});
 		}
 
-		private Task UpdateEnvironmentVariable(Version version)
+		private Task UpdateEnvironmentVariables(Version version)
 		{
 			return Task.Run(() =>
 			{
-				var current = Environment.GetEnvironmentVariable("PHP_VERSION_MAJOR", EnvironmentVariableTarget.Machine);
-				var future = version.Major.ToString();
+				var currentPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
+				var segments = currentPath.Split(';');
+				var inPath = segments.Any((segment) => segment.Equals(this.ActivePhpDir, StringComparison.InvariantCultureIgnoreCase));
 
-				if (future != current)
+				if (!inPath)
 				{
-					Environment.SetEnvironmentVariable("PHP_VERSION_MAJOR", future, EnvironmentVariableTarget.Machine);
+					var newSegments = segments.ToList();
+					newSegments.Add(this.ActivePhpDir);
+					var newPath = String.Join(";", newSegments);
+
+					Environment.SetEnvironmentVariable("PATH", newPath, EnvironmentVariableTarget.Machine);
+				}
+
+				var currentMajorVersion = Environment.GetEnvironmentVariable("PHP_VERSION_MAJOR", EnvironmentVariableTarget.Machine);
+				var newMajorVersion = version.Major.ToString();
+
+				if (newMajorVersion != currentMajorVersion)
+				{
+					Environment.SetEnvironmentVariable("PHP_VERSION_MAJOR", newMajorVersion, EnvironmentVariableTarget.Machine);
 				}
 			});
 		}

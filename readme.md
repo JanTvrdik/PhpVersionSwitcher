@@ -33,9 +33,7 @@
 	zend_extension = "%phpDir%\ext\php_xdebug.dll"
 	~~~
 
-4. The active PHP version is always symlinked to `%phpDir%\active`. You may want to add this directory to `PATH`.
-
-5. Update `phpDir` option in `PhpVersionSwitcher.json` to contain path to the base PHP directory.
+4. Update `phpDir` option in `PhpVersionSwitcher.json` to contain path to the base PHP directory.
 
 
 ### Apache + PHP module
