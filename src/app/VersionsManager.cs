@@ -111,7 +111,8 @@ namespace PhpVersionSwitcher
 				{
 					version.Major + ".x.x.ini",
 					version.Major + "." + version.Minor + ".x.ini",
-					version.Major + "." + version.Minor + "." + version.Patch + ".ini"
+					version.Major + "." + version.Minor + "." + version.Patch + ".ini",
+					version.Label + ".ini"
 				};
 
 				var dir = this.GetVersionDir(version);
