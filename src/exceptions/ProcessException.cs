@@ -2,6 +2,7 @@
 
 namespace PhpVersionSwitcher
 {
+	[Serializable]
 	class ProcessException : Exception
 	{
 		public string Name { get; private set; }
