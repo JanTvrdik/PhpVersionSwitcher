@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace PhpVersionSwitcher
 {
-	internal class ServiceManager : IProcessManager
+	internal class ServiceManager : IProcessManager, IDisposable
 	{
 		public const int WaitTime = 15;
 
@@ -78,6 +78,11 @@ namespace PhpVersionSwitcher
 
 				return this.CheckStatus(status);
 			});
+		}
+
+		public void Dispose()
+		{
+			this.service.Dispose();
 		}
 	}
 }
