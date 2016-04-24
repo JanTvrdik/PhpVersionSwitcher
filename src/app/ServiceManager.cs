@@ -6,7 +6,7 @@ namespace PhpVersionSwitcher
 {
 	internal class ServiceManager : IProcessManager
 	{
-		public const int WaitTime = 7;
+		public const int WaitTime = 15;
 
 		private ServiceController service;
 		public string GroupName { get; private set; }
