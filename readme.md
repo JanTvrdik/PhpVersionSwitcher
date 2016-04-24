@@ -28,7 +28,7 @@
 	~~~
 
 3. Create php.ini files in the `configurations` directory. In all php.ini files you can use `%phpDir%` variable. This is especially useful for `zend_extension`, e.g.
-	~~~
+	~~~ini
 	zend_extension = "%phpDir%\ext\php_opcache.dll"
 	zend_extension = "%phpDir%\ext\php_xdebug.dll"
 	~~~
@@ -39,7 +39,7 @@
 ### Apache + PHP module
 
 1. Add Apache service definition under `services` key:
-	~~~
+	~~~json
 	{
 		"services": [
 			{
@@ -51,14 +51,14 @@
 	~~~
 
 2. Update Apache configuration to contain something like this:
-	~~~
+	~~~apache
 	LoadModule php5_module "C:/web/php/active/php5apache2_4.dll"
-	PHPIniDir "C:/web/php/active"
 	AddHandler application/x-httpd-php .php
+	PHPIniDir "C:/web/php/active"
 	~~~
 
 3. You can use `PHP_VERSION_MAJOR` variable in Apache configuration file. This is useful when you switch between PHP 5 and PHP 7 versions:
-	~~~
+	~~~apache
 	LoadModule php${PHP_VERSION_MAJOR}_module "C:/web/php/active/php${PHP_VERSION_MAJOR}apache2_4.dll"
 	~~~
 
@@ -66,7 +66,7 @@
 ### Nginx + PHP FastCGI
 
 1. Add Nginx and PHP FastCGI definitions under `executables` key:
-	~~~
+	~~~json
 	{
 		"executables": [
 			{
@@ -88,13 +88,13 @@
 					{"args": "-b 127.0.0.1:9308", "label": "PHP FastCGI (9308)"},
 					{"args": "-b 127.0.0.1:9309", "label": "PHP FastCGI (9309)"}
 				]
-			},
+			}
 		]
 	}
 	~~~
 
 2. Update Nginx configuration to contain something like this:
-	~~~
+	~~~nginx
 	upstream php_farm {
 		server 127.0.0.1:9300 weight=1;
 		server 127.0.0.1:9301 weight=1;
@@ -120,7 +120,7 @@
 ### Caddy + PHP FastCGI
 
 1. Add Caddy and PHP FastCGI definitions under `executables` key:
-	~~~
+	~~~json
 	{
 		"executables": [
 			{
@@ -137,7 +137,7 @@
 	~~~
 
 2. Update Caddy configuration to contain something like this:
-	~~~
+	~~~nginx
 	# https://caddyserver.com/docs/fastcgi
 	fastcgi / 127.0.0.1:9300 php
 	~~~
@@ -147,7 +147,7 @@
 
 1. Add definition under `executables` key:
 
-	~~~
+	~~~json
 	{
 		"executables": [
 			{
