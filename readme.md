@@ -62,6 +62,7 @@
 	LoadModule php${PHP_VERSION_MAJOR}_module "C:/web/php/active/php${PHP_VERSION_MAJOR}apache2_4.dll"
 	~~~
 
+
 ### Nginx + PHP FastCGI
 
 1. Add Nginx and PHP FastCGI definitions under `executables` key:
@@ -114,6 +115,33 @@
 		include        fastcgi_params;
 	}
 	~~~
+
+
+### Caddy + PHP FastCGI
+
+1. Add Caddy and PHP FastCGI definitions under `executables` key:
+	~~~
+	{
+		"executables": [
+			{
+				"label": "Caddy",
+				"path": "C:\\web\\caddy\\caddy.exe"
+			},
+			{
+				"label": "PHP FastCGI (9300)",
+				"path": "C:\\web\\php\\active\\php-cgi.exe",
+				"args": "-b 127.0.0.1:9300"
+			}
+		]
+	}
+	~~~
+
+2. Update Caddy configuration to contain something like this:
+	~~~
+	# https://caddyserver.com/docs/fastcgi
+	fastcgi / 127.0.0.1:9300 php
+	~~~
+
 
 ### PHP built-in server
 
