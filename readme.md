@@ -125,7 +125,11 @@
 			{
 				"label": "PHP FastCGI (9300)",
 				"path": "C:\\web\\php\\active\\php-cgi.exe",
-				"args": "-b 127.0.0.1:9300"
+				"args": "-b 127.0.0.1:9300",
+				"env": {
+					"PHP_FCGI_CHILDREN": "7",
+					"PHP_FCGI_MAX_REQUESTS": "0"
+				}
 			}
 		]
 	}
