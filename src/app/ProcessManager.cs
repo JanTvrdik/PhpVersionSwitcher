@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Management;
 using System;
+using System.Collections.Generic;
 
 namespace PhpVersionSwitcher
 {
@@ -12,15 +13,17 @@ namespace PhpVersionSwitcher
 		public string WorkingDirectory { get; private set; }
 		public string FileName { get; private set; }
 		public string Arguments { get; private set; }
+		public IDictionary<string, string> Env { get; private set; }
 		public string GroupName { get; private set; }
 		public Process Process { get; set; }
 
-		public ProcessManager(string path, string arguments = "", string name = null, string groupName = null)
+		public ProcessManager(string path, string arguments, IDictionary<string, string> env, string name = null, string groupName = null)
 		{
 			var info = new FileInfo(path);
 			this.WorkingDirectory = info.DirectoryName;
 			this.FileName = info.Name;
 			this.Arguments = arguments;
+			this.Env = env;
 			this.Name = name ?? info.Name;
 			this.GroupName = groupName;
 		}
@@ -41,14 +44,21 @@ namespace PhpVersionSwitcher
 			{
 				try
 				{
-					Process = Process.Start(new ProcessStartInfo
+					var info = new ProcessStartInfo
 					{
 						WorkingDirectory = this.WorkingDirectory,
 						FileName = this.FileName,
 						Arguments = this.Arguments,
 						CreateNoWindow = true,
 						WindowStyle = ProcessWindowStyle.Hidden,
-					});
+						UseShellExecute = (this.Env.Count == 0)
+					};
+
+					foreach (var pair in this.Env) {
+						info.EnvironmentVariables[pair.Key] = pair.Value;
+					}
+
+					Process = Process.Start(info);
 
 					if (Process != null && Process.WaitForExit(1000))
 					{

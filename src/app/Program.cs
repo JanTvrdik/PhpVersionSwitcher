@@ -41,13 +41,13 @@ namespace PhpVersionSwitcher
 					if (exe.Multiple == null)
 					{
 						processes = new List<ProcessManager>() {
-							new ProcessManager(exe.Path, exe.Args, exe.Label)
+							new ProcessManager(exe.Path, exe.Args, exe.Env, exe.Label)
 						};
 					}
 					else
 					{
 						processes = exe.Multiple
-							.Select(child => new ProcessManager(child.Path, child.Args, child.Label, exe.Label))
+							.Select(child => new ProcessManager(child.Path, child.Args, child.Env, child.Label, exe.Label))
 							.ToList();
 					}
 

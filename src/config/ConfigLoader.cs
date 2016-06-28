@@ -1,8 +1,10 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace PhpVersionSwitcher
 {
@@ -47,6 +49,13 @@ namespace PhpVersionSwitcher
 			exe.Label = (string) (obj["label"] ?? Missing(obj, "label"));
 			exe.Path = (string) (obj["path"] ?? parent?.Path ?? Missing(obj, "path"));
 			exe.Args = (string) (obj["args"] ?? parent?.Args ?? "");
+
+			exe.Env = parent?.Env ?? new Dictionary<string, string>();
+			var env = (JObject) obj["env"] ?? new JObject();
+			foreach (var pair in env) {
+				exe.Env.Add(pair.Key, (string) pair.Value);
+			}
+
 			exe.Multiple = obj["multiple"]?.Select(entry => this.toExecutable(entry, exe)).ToList();
 
 			return exe;

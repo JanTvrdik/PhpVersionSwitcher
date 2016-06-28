@@ -21,6 +21,7 @@ namespace PhpVersionSwitcher
 			public string Label;
 			public string Path;
 			public string Args;
+			public IDictionary<string, string> Env;
 			public List<Executable> Multiple;
 		}
 	}
