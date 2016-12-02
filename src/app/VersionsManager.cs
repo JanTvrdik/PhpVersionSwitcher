@@ -24,7 +24,7 @@ namespace PhpVersionSwitcher
 			this.switchToSuccess = true;
 		}
 
-		public SortedSet<Version> GetAvailable()
+		public IEnumerable<Version> GetAvailable()
 		{
 			var versions = new SortedSet<Version>();
 
