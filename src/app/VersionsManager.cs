@@ -117,7 +117,7 @@ namespace PhpVersionSwitcher
 
 				var dir = this.GetVersionDir(version);
 				var ini = new StringBuilder();
-				foreach (var file in files)
+				foreach (var file in files.Distinct())
 				{
 					var path = this.ConfigurationDir + "\\" + file;
 					if (File.Exists(path))
