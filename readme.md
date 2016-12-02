@@ -1,6 +1,6 @@
-# PhpVersionSwitcher
+# PHP Version Switcher
 
-![PhpVersionSwitcher screenshot](docs/assets/screenshot.png)
+![PHP Version Switcher screenshot](docs/assets/screenshot.png)
 
 
 ## Installation
